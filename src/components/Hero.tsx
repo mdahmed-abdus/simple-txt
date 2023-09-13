@@ -3,12 +3,13 @@ export default function Hero() {
     <div className="mt-32 font-thin text-center">
       <h1 className="text-6xl">simple-txt</h1>
       <p className="mt-4 text-lg">A simple note taking app.</p>
-      <p className="mt-8 text-primary text-sm">
+      <p className="mt-16 text-primary text-sm">
         Designed and developed by @
         <a
-          className="hover:text-destructive hover:underline"
+          className="hover:underline"
           href="https://github.com/mdahmed-abdus"
           target="_blank"
+          rel="noopener noreferrer"
         >
           mdahmed-abdus
         </a>
