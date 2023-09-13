@@ -21,6 +21,11 @@ export default function Navbar() {
             About
           </Link>
         </li>
+        <li>
+          <Link className={navLinkClassName} href="/login">
+            Login
+          </Link>
+        </li>
       </ul>
     </nav>
   );
