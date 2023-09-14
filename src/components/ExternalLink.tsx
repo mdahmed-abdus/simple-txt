@@ -1,4 +1,5 @@
 import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
 
 export default function ExternalLink({
   className = '',
@@ -20,7 +21,7 @@ export default function ExternalLink({
   return (
     <Button className="p-0" variant="link" asChild>
       <a
-        className={`font-thin ${className}`}
+        className={cn('font-thin', className)}
         href={href}
         target={target}
         rel={rel}
