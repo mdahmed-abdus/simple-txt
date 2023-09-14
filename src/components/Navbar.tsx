@@ -4,7 +4,7 @@ export default function Navbar() {
   const navLinkClassName = 'hover:underline';
 
   return (
-    <nav className="container py-4 flex justify-between font-thin">
+    <nav className="py-4 flex justify-between font-thin">
       <div>
         <Link className={navLinkClassName} href="/">
           simple-txt
