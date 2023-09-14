@@ -1,3 +1,5 @@
+import ExternalLink from './ExternalLink';
+
 export default function Hero() {
   return (
     <div className="mt-16 md:mt-32 font-thin text-center">
@@ -5,14 +7,10 @@ export default function Hero() {
       <p className="mt-4 text-lg">A simple note taking app.</p>
       <p className="mt-16 text-primary text-sm">
         Designed and developed by @
-        <a
-          className="hover:underline"
+        <ExternalLink
+          text="mdahmed-abdus"
           href="https://github.com/mdahmed-abdus"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          mdahmed-abdus
-        </a>
+        />
       </p>
     </div>
   );

@@ -1,4 +1,5 @@
 import { Separator } from './ui/separator';
+import ExternalLink from './ExternalLink';
 
 export default function About() {
   return (
@@ -7,42 +8,23 @@ export default function About() {
       <p className="mt-4">This project was created as part of my portfolio.</p>
       <p>Feel free to reach out if you have any questions.</p>
       <div className="mt-16 flex h-5 space-x-4 items-center justify-center text-sm">
-        <a
-          className="hover:underline"
-          href="mailto:mdahmed.abdus@gmail.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Email
-        </a>
+        <ExternalLink text="Email" href="mailto:mdahmed.abdus@gmail.com" />
         <Separator className="" orientation="vertical" decorative />
-        <a
-          className="hover:underline"
+        <ExternalLink
+          text="Twitter / X"
           href="https://twitter.com/mdahmed_abdus"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Twitter / X
-        </a>
+        />
         <Separator orientation="vertical" />
-        <a
-          className="hover:underline"
+        <ExternalLink
+          text="LinkedIn"
           href="https://www.linkedin.com/in/mdahmed-abdus/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          LinkedIn
-        </a>
+        />
       </div>
       <div className="mt-4 text-sm">
-        <a
-          className="hover:underline"
+        <ExternalLink
+          text="Source code"
           href="https://github.com/mdahmed-abdus"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Source code
-        </a>
+        />
       </div>
     </div>
   );
