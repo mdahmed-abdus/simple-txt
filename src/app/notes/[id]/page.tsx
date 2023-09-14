@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import Link from 'next/link';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,6 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import InternalLink from '@/components/ui/InternalLink';
 
 export default function NoteById({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true);
@@ -130,9 +130,11 @@ export default function NoteById({ params }: { params: { id: string } }) {
         </div>
       )}
       <div className="text-center">
-        <Button variant="link" className="font-normal" asChild>
-          <Link href="/dashboard">All notes</Link>
-        </Button>
+        <InternalLink
+          className="text-sm font-normal"
+          text="All notes"
+          href="/dashboard"
+        />
       </div>
     </div>
   );

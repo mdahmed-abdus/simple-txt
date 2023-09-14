@@ -1,30 +1,20 @@
-import Link from 'next/link';
+import InternalLink from './ui/InternalLink';
 
 export default function Navbar() {
-  const navLinkClassName = 'hover:underline';
-
   return (
     <nav className="py-4 flex justify-between font-thin">
       <div>
-        <Link className={navLinkClassName} href="/">
-          simple-txt
-        </Link>
+        <InternalLink text="simple-txt" href="/" />
       </div>
       <ul className="flex gap-8">
         <li>
-          <Link className={navLinkClassName} href="/">
-            Home
-          </Link>
+          <InternalLink className="text-sm" text="Home" href="/" />
         </li>
         <li>
-          <Link className={navLinkClassName} href="#about">
-            About
-          </Link>
+          <InternalLink className="text-sm" text="About" href="/#about" />
         </li>
         <li>
-          <Link className={navLinkClassName} href="/login">
-            Login
-          </Link>
+          <InternalLink className="text-sm" text="Login" href="/login" />
         </li>
       </ul>
     </nav>

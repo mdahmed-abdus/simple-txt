@@ -14,8 +14,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { Separator } from '@/components/ui/separator';
-import Link from 'next/link';
 import Image from 'next/image';
+import InternalLink from '@/components/ui/InternalLink';
 
 const passwordSchema = z
   .string()
@@ -104,9 +104,7 @@ export default function Register() {
         <h1 className="text-3xl text-center">Create a new account</h1>
         <p className="mt-4 text-center font-thin">
           Already have an account?{' '}
-          <Link className="hover:underline" href="/login">
-            Login here
-          </Link>
+          <InternalLink className="" text="Login here" href="/login" />
         </p>
         <div className="mt-16 sm:w-1/2 mx-auto">
           <Form {...form}>

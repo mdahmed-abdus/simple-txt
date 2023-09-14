@@ -14,8 +14,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { Separator } from '@/components/ui/separator';
-import Link from 'next/link';
 import Image from 'next/image';
+import InternalLink from '@/components/ui/InternalLink';
 
 const passwordSchema = z
   .string()
@@ -116,10 +116,7 @@ export default function Profile() {
       <div>
         <h1 className="text-3xl text-center">Edit your profile</h1>
         <p className="mt-4 text-center font-thin">
-          Not {user.name}?{' '}
-          <Link className="hover:underline" href="/login">
-            Logout here
-          </Link>
+          Not {user.name}? <InternalLink text="Logout here" href="/login" />
         </p>
         <div className="mt-16 sm:w-1/2 mx-auto">
           <Form {...form}>

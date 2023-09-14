@@ -14,8 +14,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { Separator } from '@/components/ui/separator';
-import Link from 'next/link';
 import Image from 'next/image';
+import InternalLink from '@/components/ui/InternalLink';
 
 const formSchema = z.object({
   email: z
@@ -74,9 +74,7 @@ export default function Login() {
         <h1 className="text-3xl text-center">Login to your account</h1>
         <p className="mt-4 text-center font-thin">
           Don&apos;t have an account?{' '}
-          <Link className="hover:underline" href="/register">
-            Register here
-          </Link>
+          <InternalLink text="Register here" href="/register" />
         </p>
         <div className="mt-16 sm:w-1/2 mx-auto">
           <Form {...form}>
