@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 export default function Navbar() {
-  const navLinkClassName = 'hover:text-destructive';
+  const navLinkClassName = 'hover:underline';
 
   return (
     <nav className="container py-4 flex justify-between font-thin">
