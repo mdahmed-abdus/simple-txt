@@ -10,8 +10,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
+  const router = useRouter();
+
   const user = {
     name: 'John Doe',
     email: 'johndoe@domain.com',
@@ -34,10 +37,6 @@ export default function Dashboard() {
       body: 'Curiosity is a relentless companion, and these chronicles are its testament. With every entry, I venture further into the realms of the unknown, driven by the thirst for knowledge.',
     },
   ];
-
-  const viewNote = (id: string) => {};
-
-  const addNewNote = () => {};
 
   return (
     <div className="container mt-16 md:mt-32 font-thin">
@@ -65,7 +64,11 @@ export default function Dashboard() {
             <TableHead>Title</TableHead>
             <TableHead>Body</TableHead>
             <TableHead className="text-right">
-              <Button className="font-thin" variant="link" onClick={addNewNote}>
+              <Button
+                className="font-thin"
+                variant="link"
+                onClick={() => router.push('notes/new')}
+              >
                 Add new note
               </Button>
             </TableHead>
@@ -81,7 +84,7 @@ export default function Dashboard() {
                 <Button
                   className="font-thin"
                   variant="link"
-                  onClick={() => viewNote(id)}
+                  onClick={() => router.push(`notes/${id}`)}
                 >
                   View
                 </Button>
