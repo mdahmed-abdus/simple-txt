@@ -46,12 +46,12 @@ export default function NoteById({ params }: { params: { id: string } }) {
         <div>
           {editMode ? (
             <Input
-              className="p-0 h-fit text-3xl"
+              className="p-2 h-fit text-3xl"
               value={updatedNote.title}
               onChange={e => setUpdatedNote({ ...note, title: e.target.value })}
             />
           ) : (
-            <h1 className="p-0 text-3xl border border-transparent">
+            <h1 className="p-2 text-3xl border border-transparent">
               {note.title}
             </h1>
           )}
