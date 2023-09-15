@@ -1,7 +1,8 @@
 import axios, { AxiosResponse } from 'axios';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-const USER_URL = BASE_URL + '/users';
+
+const http = axios.create({ baseURL: BASE_URL, withCredentials: true });
 
 type apiFuncType = () => Promise<AxiosResponse<any, any>>;
 
@@ -20,17 +21,16 @@ const apiHandler = async (apiFunc: apiFuncType) => {
   }
 };
 
-export const getUserData = () => apiHandler(() => axios.get(`${USER_URL}/`));
+export const getUserData = () => apiHandler(() => http.get('/users/'));
 
 export const registerUser = (registerUserData: {
   name: string;
   email: string;
   password: string;
   confirmPassword: string;
-}) => apiHandler(() => axios.post(`${USER_URL}/register`, registerUserData));
+}) => apiHandler(() => http.post('/users/register', registerUserData));
 
 export const loginUser = (loginUserData: { email: string; password: string }) =>
-  apiHandler(() => axios.post(`${USER_URL}/login`, loginUserData));
+  apiHandler(() => http.post('/users/login', loginUserData));
 
-export const logoutUser = () =>
-  apiHandler(() => axios.post(`${USER_URL}/logout`));
+export const logoutUser = () => apiHandler(() => http.post('/logout'));
