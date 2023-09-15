@@ -54,15 +54,15 @@ export default function NoteById({ params }: { params: { id: string } }) {
           <Skeleton className="mt-8 mb-16 w-3/4 h-[200px] mx-auto" />
         </div>
       ) : (
-        <div>
+        <div className="md:w-3/4 md:mx-auto">
           {editMode ? (
             <Input
-              className="p-2 h-fit text-3xl"
+              className="p-2 h-fit text-3xl text-center"
               value={updatedNote.title}
               onChange={e => setUpdatedNote({ ...note, title: e.target.value })}
             />
           ) : (
-            <h1 className="p-2 text-3xl border border-transparent">
+            <h1 className="p-2 text-3xl border border-transparent text-center">
               {note.title}
             </h1>
           )}

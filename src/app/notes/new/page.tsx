@@ -17,8 +17,10 @@ export default function NewNote() {
 
   return (
     <div className="mt-16 md:mt-32">
-      <h1 className="text-3xl border border-transparent">Add new note</h1>
-      <div className="mt-16">
+      <h1 className="text-3xl border border-transparent text-center">
+        Add new note
+      </h1>
+      <div className="mt-16 md:w-3/4 lg:w-1/2 md:mx-auto">
         <Label>Title</Label>
         <Input
           className="mt-4 p-0 h-fit border-0 text-base"
