@@ -16,6 +16,9 @@ import { useForm } from 'react-hook-form';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import InternalLink from '@/components/ui/InternalLink';
+import { registerUser } from '@/services/apiService';
+import { useToast } from '@/components/ui/use-toast';
+import { useRouter } from 'next/navigation';
 
 const passwordSchema = z
   .string()
@@ -49,6 +52,9 @@ const formSchema = z
   });
 
 export default function Register() {
+  const router = useRouter();
+  const { toast } = useToast();
+
   const formFields = [
     {
       name: 'name' as const,
@@ -87,7 +93,14 @@ export default function Register() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    registerUser(values)
+      .then(data => {
+        toast({ description: data.message });
+        router.push('/users/email/verify');
+      })
+      .catch(error =>
+        toast({ variant: 'destructive', description: error.message })
+      );
   }
 
   return (

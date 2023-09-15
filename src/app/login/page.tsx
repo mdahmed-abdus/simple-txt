@@ -17,6 +17,8 @@ import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import InternalLink from '@/components/ui/InternalLink';
 import { loginUser } from '@/services/apiService';
+import { useToast } from '@/components/ui/use-toast';
+import { useRouter } from 'next/navigation';
 
 const formSchema = z.object({
   email: z
@@ -37,6 +39,9 @@ const formSchema = z.object({
 });
 
 export default function Login() {
+  const router = useRouter();
+  const { toast } = useToast();
+
   const formFields = [
     {
       name: 'email' as const,
@@ -58,7 +63,14 @@ export default function Login() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    loginUser(values)
+      .then(data => {
+        toast({ description: data.message });
+        router.push('/dashboard');
+      })
+      .catch(error =>
+        toast({ variant: 'destructive', description: error.message })
+      );
   }
 
   return (
@@ -109,6 +121,14 @@ export default function Login() {
               <Button type="submit" className="mt-16 w-fit">
                 Login
               </Button>
+              <p className="mt-8 font-thin text-sm">
+                Email not verified?{' '}
+                <InternalLink
+                  className="text-sm"
+                  text="Verify here"
+                  href="/users/email/verify"
+                />
+              </p>
             </form>
           </Form>
         </div>
