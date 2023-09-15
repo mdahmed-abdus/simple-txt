@@ -15,7 +15,9 @@ import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
-import InternalLink from '@/components/ui/InternalLink';
+import { logoutUser } from '@/services/apiService';
+import { useToast } from '@/components/ui/use-toast';
+import { useRouter } from 'next/navigation';
 
 const passwordSchema = z
   .string()
@@ -54,6 +56,8 @@ export default function Profile() {
     name: 'John Doe',
     email: 'johndoe@domain.com',
   };
+  const { toast } = useToast();
+  const router = useRouter();
 
   const formFields = [
     {
@@ -103,6 +107,17 @@ export default function Profile() {
     console.log(values);
   }
 
+  const logout = () => {
+    logoutUser()
+      .then(data => {
+        toast({ description: data.message });
+        router.push('/login');
+      })
+      .catch(error =>
+        toast({ variant: 'destructive', description: error.message })
+      );
+  };
+
   return (
     <div className="container md:mt-32 grid grid-cols-1 md:grid-cols-2">
       <div className="h-[400px] md:h-full relative">
@@ -116,7 +131,14 @@ export default function Profile() {
       <div>
         <h1 className="text-3xl text-center">Edit your profile</h1>
         <p className="mt-4 text-center font-thin">
-          Not {user.name}? <InternalLink text="Logout here" href="/login" />
+          Not {user.name}?{' '}
+          <Button
+            className="font-thin text-base p-0"
+            variant="link"
+            onClick={logout}
+          >
+            Logout here
+          </Button>
         </p>
         <div className="mt-16 sm:w-1/2 mx-auto">
           <Form {...form}>
