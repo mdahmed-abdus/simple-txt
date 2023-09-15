@@ -16,6 +16,7 @@ import { useForm } from 'react-hook-form';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import InternalLink from '@/components/ui/InternalLink';
+import { loginUser } from '@/services/apiService';
 
 const formSchema = z.object({
   email: z
