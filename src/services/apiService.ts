@@ -33,4 +33,4 @@ export const registerUser = (registerUserData: {
 export const loginUser = (loginUserData: { email: string; password: string }) =>
   apiHandler(() => http.post('/users/login', loginUserData));
 
-export const logoutUser = () => apiHandler(() => http.post('/logout'));
+export const logoutUser = () => apiHandler(() => http.post('/users/logout'));
