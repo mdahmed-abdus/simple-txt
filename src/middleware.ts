@@ -3,12 +3,34 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const authCookie = request ? request.cookies.get('user-sid') : null;
+  const path = request.nextUrl.pathname;
 
-  if (!authCookie) {
+  const isPublicPath = [
+    '/login',
+    '/register',
+    '/users/email/verify',
+    '/users/password/reset',
+  ].includes(path);
+
+  // for authenticated users
+  if (authCookie && isPublicPath) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  // for !authenticated users
+  if (!authCookie && !isPublicPath) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 }
 
 export const config = {
-  matcher: ['/dashboard', '/profile', '/notes/:path*'],
+  matcher: [
+    '/dashboard',
+    '/profile',
+    '/notes/:path*',
+    '/login',
+    '/register',
+    '/users/email/verify',
+    '/users/password/reset',
+  ],
 };
