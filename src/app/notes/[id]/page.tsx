@@ -17,34 +17,76 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import InternalLink from '@/components/ui/InternalLink';
+import {
+  deleteNoteById,
+  getNoteById,
+  updateNoteById,
+} from '@/services/apiService';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function NoteById({ params }: { params: { id: string } }) {
+  const router = useRouter();
+  const { toast } = useToast();
+
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
-  const [note, setNote] = useState({ id: '', title: '', body: '' });
+  const [note, setNote] = useState({ _id: '', title: '', body: '' });
   const [updatedNote, setUpdatedNote] = useState({
-    id: '',
+    _id: '',
     title: '',
     body: '',
   });
 
-  useEffect(() => {
-    setNote({
-      id: '60f94b03e52b1f001c050235',
-      title: 'Notes from the Unknown',
-      body: 'In the quiet corners of uncertainty, I collect these fragments of knowledge and wonder. Each note is a step deeper into the uncharted territory of discovery.',
-    });
-    setLoading(false);
-  }, [params.id]);
+  const loadNote = () => {
+    setLoading(true);
+    getNoteById(params.id)
+      .then(data => {
+        setNote(data.note);
+        setLoading(false);
+      })
+      .catch(error => {
+        toast({ variant: 'destructive', description: error.message });
+        setLoading(false);
+      });
+  };
+
+  useEffect(
+    () => loadNote(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   const editNote = () => {
     setUpdatedNote(note);
     setEditMode(!editMode);
   };
 
-  const deleteNote = () => {};
+  const deleteNote = () => {
+    deleteNoteById(note._id)
+      .then(data => {
+        toast({ description: data.message });
+        router.push('/dashboard');
+      })
+      .catch(error =>
+        toast({ variant: 'destructive', description: error.message })
+      );
+  };
 
-  const updateNote = () => {};
+  const updateNote = () => {
+    updateNoteById(note._id, {
+      title: updatedNote.title,
+      body: updatedNote.body,
+    })
+      .then(data => {
+        toast({ description: data.message });
+        loadNote();
+        setEditMode(!editMode);
+      })
+      .catch(error =>
+        toast({ variant: 'destructive', description: error.message })
+      );
+  };
 
   return (
     <div className="mt-16 md:mt-32">
@@ -59,7 +101,9 @@ export default function NoteById({ params }: { params: { id: string } }) {
             <Input
               className="p-2 h-fit text-3xl text-center"
               value={updatedNote.title}
-              onChange={e => setUpdatedNote({ ...note, title: e.target.value })}
+              onChange={e =>
+                setUpdatedNote({ ...updatedNote, title: e.target.value })
+              }
             />
           ) : (
             <h1 className="p-2 text-3xl border border-transparent text-center">
@@ -72,7 +116,7 @@ export default function NoteById({ params }: { params: { id: string } }) {
                 className="p-2 text-base"
                 value={updatedNote.body}
                 onChange={e =>
-                  setUpdatedNote({ ...note, body: e.target.value })
+                  setUpdatedNote({ ...updatedNote, body: e.target.value })
                 }
               />
             ) : (

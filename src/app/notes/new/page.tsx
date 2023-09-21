@@ -7,13 +7,27 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { Separator } from '@/components/ui/separator';
+import { addNewNote } from '@/services/apiService';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function NewNote() {
   const router = useRouter();
+  const { toast } = useToast();
 
-  const [note, setNote] = useState({ id: '', title: '', body: '' });
+  const [note, setNote] = useState({ title: '', body: '' });
 
-  const saveNote = () => {};
+  const saveNote = () => {
+    addNewNote(note)
+      .then(data => {
+        toast({ description: data.message });
+        console.log(data);
+        router.push('/dashboard');
+      })
+      .catch(error => {
+        toast({ variant: 'destructive', description: error.message });
+        console.log(error);
+      });
+  };
 
   return (
     <div className="mt-16 md:mt-32">
@@ -42,7 +56,7 @@ export default function NewNote() {
         <Button className="font-normal" variant="link" onClick={router.back}>
           Cancel
         </Button>
-        <Button className="font-normal" onClick={() => saveNote}>
+        <Button className="font-normal" onClick={saveNote}>
           Save
         </Button>
       </div>
