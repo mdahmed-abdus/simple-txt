@@ -34,3 +34,19 @@ export const loginUser = (loginUserData: { email: string; password: string }) =>
   apiHandler(() => http.post('/users/login', loginUserData));
 
 export const logoutUser = () => apiHandler(() => http.post('/users/logout'));
+
+export const getAllNotes = () => apiHandler(() => http.get('/notes'));
+
+export const addNewNote = (noteData: { title: string; body: string }) =>
+  apiHandler(() => http.post('/notes', noteData));
+
+export const getNoteById = (id: string) =>
+  apiHandler(() => http.get(`/notes/${id}`));
+
+export const updateNoteById = (
+  id: string,
+  noteData: { title: string; body: string }
+) => apiHandler(() => http.put(`/notes/${id}`, noteData));
+
+export const deleteNoteById = (id: string) =>
+  apiHandler(() => http.delete(`/notes/${id}`));
