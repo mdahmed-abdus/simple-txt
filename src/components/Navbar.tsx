@@ -1,6 +1,37 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import InternalLink from './ui/InternalLink';
+import { getUserData, logoutUser } from '@/services/apiService';
+import { useToast } from '@/components/ui/use-toast';
+import { useRouter } from 'next/navigation';
+import { Button } from './ui/button';
+import { useAuthContext } from '@/context/authContext';
 
 export default function Navbar() {
+  const { authStatus, setAuthStatus } = useAuthContext();
+  const { toast } = useToast();
+  const router = useRouter();
+
+  useEffect(() => {
+    getUserData()
+      .then(() => setAuthStatus(true))
+      .catch(() => setAuthStatus(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const logout = () => {
+    logoutUser()
+      .then(data => {
+        toast({ description: data.message });
+        router.push('/login');
+        setAuthStatus(false);
+      })
+      .catch(error =>
+        toast({ variant: 'destructive', description: error.message })
+      );
+  };
+
   return (
     <nav className="py-4 flex justify-between font-thin">
       <div>
@@ -13,9 +44,44 @@ export default function Navbar() {
         <li>
           <InternalLink className="text-sm" text="About" href="/#about" />
         </li>
-        <li>
-          <InternalLink className="text-sm" text="Login" href="/login" />
-        </li>
+        {authStatus ? (
+          <>
+            <li>
+              <InternalLink
+                className="text-sm"
+                text="Dashboard"
+                href="/dashboard"
+              />
+            </li>
+            <li>
+              <InternalLink
+                className="text-sm"
+                text="Profile"
+                href="/profile"
+              />
+            </li>
+            <Button
+              className="font-thin text-sm p-0"
+              variant="link"
+              onClick={logout}
+            >
+              Logout
+            </Button>
+          </>
+        ) : (
+          <>
+            <li>
+              <InternalLink
+                className="text-sm"
+                text="Register"
+                href="/register"
+              />
+            </li>
+            <li>
+              <InternalLink className="text-sm" text="Login" href="/login" />
+            </li>
+          </>
+        )}
       </ul>
     </nav>
   );
