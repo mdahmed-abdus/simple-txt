@@ -53,12 +53,8 @@ const formSchema = z
   });
 
 export default function Profile() {
-  const { setAuthStatus, setUser } = useAuthContext();
+  const { user, setAuthStatus, setUser } = useAuthContext();
 
-  const user = {
-    name: 'John Doe',
-    email: 'johndoe@domain.com',
-  };
   const { toast } = useToast();
   const router = useRouter();
 
