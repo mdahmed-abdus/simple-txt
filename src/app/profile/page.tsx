@@ -15,10 +15,11 @@ import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
-import { logoutUser } from '@/services/apiService';
+import { getUserData, logoutUser } from '@/services/apiService';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/context/authContext';
+import { useEffect, useState } from 'react';
 
 const passwordSchema = z
   .string()
@@ -53,23 +54,37 @@ const formSchema = z
   });
 
 export default function Profile() {
-  const { user, setAuthStatus, setUser } = useAuthContext();
-
+  const { setAuthStatus, setUser } = useAuthContext();
   const { toast } = useToast();
   const router = useRouter();
+
+  const [userData, setUserData] = useState({ name: '', email: '' });
+
+  useEffect(() => {
+    getUserData()
+      .then(data => {
+        const { name, email } = data.user;
+        setUserData({ name, email });
+        form.reset({ name, email });
+      })
+      .catch(error =>
+        toast({ variant: 'destructive', description: error.message })
+      );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const formFields = [
     {
       name: 'name' as const,
       label: 'Name',
       inputType: 'text',
-      inputPlaceholder: 'Enter your name',
+      inputPlaceholder: 'Edit your name',
     },
     {
       name: 'email' as const,
       label: 'Email',
       inputType: 'email',
-      inputPlaceholder: 'Enter your email',
+      inputPlaceholder: 'Edit your email',
     },
     {
       name: 'currentPassword' as const,
@@ -94,8 +109,8 @@ export default function Profile() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: user.name,
-      email: user.email,
+      name: userData.name,
+      email: userData.email,
       currentPassword: '',
       newPassword: '',
       confirmNewPassword: '',
@@ -103,7 +118,7 @@ export default function Profile() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    toast({ description: 'Feature to update profile coming soon' });
   }
 
   const logout = () => {
@@ -132,7 +147,7 @@ export default function Profile() {
       <div>
         <h1 className="text-3xl text-center">Edit your profile</h1>
         <p className="mt-4 text-center font-thin">
-          Not {user.name}?{' '}
+          Not {userData.name}?{' '}
           <Button
             className="font-thin text-base p-0"
             variant="link"
@@ -170,8 +185,8 @@ export default function Profile() {
                   )}
                 />
               ))}
-              <Button type="submit" className="mt-16 w-fit">
-                Update
+              <Button disabled type="submit" className="mt-16 w-fit">
+                Feature coming soon
               </Button>
             </form>
           </Form>
