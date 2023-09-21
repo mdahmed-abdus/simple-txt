@@ -3,6 +3,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Rubik } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
+import { AuthContextProvider } from '@/context/authContext';
 
 const rubik = Rubik({ subsets: ['latin'] });
 
@@ -18,11 +19,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={rubik.className + ' container'}>
-        <Navbar />
-        <div>{children}</div>
-        <Toaster />
-      </body>
+      <AuthContextProvider>
+        <body className={rubik.className + ' container'}>
+          <Navbar />
+          <div>{children}</div>
+          <Toaster />
+        </body>
+      </AuthContextProvider>
     </html>
   );
 }
