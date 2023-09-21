@@ -18,6 +18,7 @@ import Image from 'next/image';
 import { logoutUser } from '@/services/apiService';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
+import { useAuthContext } from '@/context/authContext';
 
 const passwordSchema = z
   .string()
@@ -52,6 +53,8 @@ const formSchema = z
   });
 
 export default function Profile() {
+  const { setAuthStatus } = useAuthContext();
+
   const user = {
     name: 'John Doe',
     email: 'johndoe@domain.com',
@@ -112,6 +115,7 @@ export default function Profile() {
       .then(data => {
         toast({ description: data.message });
         router.push('/login');
+        setAuthStatus(false);
       })
       .catch(error =>
         toast({ variant: 'destructive', description: error.message })

@@ -19,6 +19,7 @@ import InternalLink from '@/components/ui/InternalLink';
 import { loginUser } from '@/services/apiService';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
+import { useAuthContext } from '@/context/authContext';
 
 const formSchema = z.object({
   email: z
@@ -39,6 +40,7 @@ const formSchema = z.object({
 });
 
 export default function Login() {
+  const { setAuthStatus } = useAuthContext();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -67,10 +69,12 @@ export default function Login() {
       .then(data => {
         toast({ description: data.message });
         router.push('/dashboard');
+        setAuthStatus(true);
       })
-      .catch(error =>
-        toast({ variant: 'destructive', description: error.message })
-      );
+      .catch(error => {
+        toast({ variant: 'destructive', description: error.message });
+        setAuthStatus(false);
+      });
   }
 
   return (
