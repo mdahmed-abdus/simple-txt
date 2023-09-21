@@ -15,8 +15,15 @@ export default function Navbar() {
 
   useEffect(() => {
     getUserData()
-      .then(() => setAuthStatus(true))
-      .catch(() => setAuthStatus(false));
+      .then(data => {
+        const { name, email } = data.user;
+        setAuthStatus(true);
+        setUser({ name, email });
+      })
+      .catch(() => {
+        setAuthStatus(false);
+        setUser({ name: '', email: '' });
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
