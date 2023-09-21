@@ -40,7 +40,7 @@ const formSchema = z.object({
 });
 
 export default function Login() {
-  const { setAuthStatus } = useAuthContext();
+  const { setAuthStatus, setUser } = useAuthContext();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -68,12 +68,14 @@ export default function Login() {
     loginUser(values)
       .then(data => {
         toast({ description: data.message });
-        router.push('/dashboard');
         setAuthStatus(true);
+        setUser({ name: data.user.name, email: data.user.email });
+        router.push('/dashboard');
       })
       .catch(error => {
         toast({ variant: 'destructive', description: error.message });
         setAuthStatus(false);
+        setUser({ name: '', email: '' });
       });
   }
 

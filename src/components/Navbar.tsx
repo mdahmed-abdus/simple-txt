@@ -9,7 +9,7 @@ import { Button } from './ui/button';
 import { useAuthContext } from '@/context/authContext';
 
 export default function Navbar() {
-  const { authStatus, setAuthStatus } = useAuthContext();
+  const { authStatus, setAuthStatus, setUser } = useAuthContext();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -24,8 +24,9 @@ export default function Navbar() {
     logoutUser()
       .then(data => {
         toast({ description: data.message });
-        router.push('/login');
         setAuthStatus(false);
+        setUser({ name: '', email: '' });
+        router.push('/login');
       })
       .catch(error =>
         toast({ variant: 'destructive', description: error.message })

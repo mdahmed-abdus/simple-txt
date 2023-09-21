@@ -53,7 +53,7 @@ const formSchema = z
   });
 
 export default function Profile() {
-  const { setAuthStatus } = useAuthContext();
+  const { setAuthStatus, setUser } = useAuthContext();
 
   const user = {
     name: 'John Doe',
@@ -114,8 +114,9 @@ export default function Profile() {
     logoutUser()
       .then(data => {
         toast({ description: data.message });
-        router.push('/login');
         setAuthStatus(false);
+        setUser({ name: '', email: '' });
+        router.push('/login');
       })
       .catch(error =>
         toast({ variant: 'destructive', description: error.message })
