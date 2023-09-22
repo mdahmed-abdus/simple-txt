@@ -81,10 +81,12 @@ export default function Login() {
 
   return (
     <div className="container md:mt-32 grid grid-cols-1 md:grid-cols-2">
-      <div className="h-[400px] md:h-full relative">
+      <div className="w-full h-[500px] relative">
         <Image
           src="/illustrations/login.jpg"
-          layout="fill"
+          fill
+          priority
+          sizes="(min-width: 1480px) 634px, (min-width: 780px) calc(45.59vw - 32px), calc(100vw - 130px)"
           style={{ objectFit: 'contain' }}
           alt="Illustration of a person entering a pin to unlock the system"
         />

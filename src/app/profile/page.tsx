@@ -136,10 +136,12 @@ export default function Profile() {
 
   return (
     <div className="container md:mt-32 grid grid-cols-1 md:grid-cols-2">
-      <div className="h-[400px] md:h-full relative">
+      <div className="w-full h-[500px] relative">
         <Image
           src="/illustrations/notes.jpg"
-          layout="fill"
+          fill
+          priority
+          sizes="(min-width: 1480px) 636px, (min-width: 780px) calc(45.59vw - 30px), calc(100vw - 128px)"
           style={{ objectFit: 'contain' }}
           alt="Illustration of a person using mobile phone"
         />
