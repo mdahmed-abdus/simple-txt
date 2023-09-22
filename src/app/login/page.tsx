@@ -127,14 +127,24 @@ export default function Login() {
               <Button type="submit" className="mt-16 w-fit">
                 Login
               </Button>
-              <p className="mt-8 font-thin text-sm">
-                Email not verified?{' '}
-                <InternalLink
-                  className="text-sm"
-                  text="Verify here"
-                  href="/users/email/verify"
-                />
-              </p>
+              <div className="mt-8 font-thin text-sm">
+                <p>
+                  Email not verified?{' '}
+                  <InternalLink
+                    className="text-sm"
+                    text="Verify here"
+                    href="/users/email/verify"
+                  />
+                </p>
+                <p className="mt-2">
+                  Forgot password?{' '}
+                  <InternalLink
+                    className="text-sm"
+                    text="Reset here"
+                    href="/users/password/reset"
+                  />
+                </p>
+              </div>
             </form>
           </Form>
         </div>
