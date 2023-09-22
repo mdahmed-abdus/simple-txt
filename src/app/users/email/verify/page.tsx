@@ -98,7 +98,9 @@ function WithToken({
         </>
       ) : (
         <>
-          <p className="text-destructive">Email not verified.</p>
+          <p className="text-destructive">
+            Email is already verified or verification link has expired.
+          </p>
           <div className="mt-16">
             <p>Enter your email and we will send a new verification link.</p>
             <Input
