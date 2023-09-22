@@ -45,7 +45,7 @@ export default function Navbar() {
       <div>
         <InternalLink text="simple-txt" href="/" />
       </div>
-      <ul className="flex gap-8">
+      <ul className="flex gap-8 items-center">
         <li>
           <InternalLink className="text-sm" text="Home" href="/" />
         </li>
@@ -69,7 +69,7 @@ export default function Navbar() {
               />
             </li>
             <Button
-              className="font-thin text-sm p-0"
+              className="p-0 h-fit font-thin text-sm"
               variant="link"
               onClick={logout}
             >
