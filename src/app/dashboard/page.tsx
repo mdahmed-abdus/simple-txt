@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useToast } from '@/components/ui/use-toast';
 import { useAuthContext } from '@/context/authContext';
 import { getAllNotes } from '@/services/apiService';
 import { useRouter } from 'next/navigation';
@@ -18,6 +19,7 @@ import { useEffect, useState } from 'react';
 export default function Dashboard() {
   const { user } = useAuthContext();
   const router = useRouter();
+  const { toast } = useToast();
 
   const [notes, setNotes] = useState<
     { _id: string; title: string; body: string }[]
@@ -26,26 +28,11 @@ export default function Dashboard() {
   useEffect(() => {
     getAllNotes()
       .then(data => setNotes(data.notes))
-      .catch(error => console.log(error));
+      .catch(error =>
+        toast({ variant: 'destructive', description: error.message })
+      );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // const notes: { id: string; title: string; body: string }[] = [
-  //   {
-  //     id: '60f94b03e52b1f001c050235',
-  //     title: 'Notes from the Unknown',
-  //     body: 'In the quiet corners of uncertainty, I collect these fragments of knowledge and wonder. Each note is a step deeper into the uncharted territory of discovery.',
-  //   },
-  //   {
-  //     id: '60f94b19e52b1f001c050236',
-  //     title: 'A Day in Reflection',
-  //     body: 'As the sun sets on another day, I take a moment to reflect on the journey traveled. These notes serve as the mirror to my thoughts, capturing the ripples of experiences.',
-  //   },
-  //   {
-  //     id: '60f94b2ce52b1f001c050237',
-  //     title: 'Chronicles of Curiosity',
-  //     body: 'Curiosity is a relentless companion, and these chronicles are its testament. With every entry, I venture further into the realms of the unknown, driven by the thirst for knowledge.',
-  //   },
-  // ];
 
   return (
     <div className="container mt-16 md:mt-32 font-thin">
