@@ -50,3 +50,20 @@ export const updateNoteById = (
 
 export const deleteNoteById = (id: string) =>
   apiHandler(() => http.delete(`/notes/${id}`));
+
+export const sendVerificationEmail = (email: string) =>
+  apiHandler(() => http.post('/users/email/resend', { email }));
+
+export const verifyEmail = (tokenId: string) =>
+  apiHandler(() => http.post(`/users/email/verify?tokenId=${tokenId}`));
+
+export const sendPasswordResetEmail = (email: string) =>
+  apiHandler(() => http.post('/users/password/forgot', { email }));
+
+export const resetPassword = (
+  tokenId: string,
+  resetPasswordData: { password: string; confirmPassword: string }
+) =>
+  apiHandler(() =>
+    http.post(`/users/password/reset?tokenId=${tokenId}`, resetPasswordData)
+  );
