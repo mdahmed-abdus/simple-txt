@@ -13,7 +13,7 @@ export default function InternalLink({
 }) {
   return (
     <Button
-      className={cn('p-0 font-thin text-base', className)}
+      className={cn('p-0 h-fit font-thin text-base', className)}
       variant="link"
       asChild
     >
