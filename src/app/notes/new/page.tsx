@@ -20,13 +20,11 @@ export default function NewNote() {
     addNewNote(note)
       .then(data => {
         toast({ description: data.message });
-        console.log(data);
         router.push('/dashboard');
       })
-      .catch(error => {
-        toast({ variant: 'destructive', description: error.message });
-        console.log(error);
-      });
+      .catch(error =>
+        toast({ variant: 'destructive', description: error.message })
+      );
   };
 
   return (
