@@ -48,6 +48,7 @@ export default function NoteById({ params }: { params: { id: string } }) {
       .catch(error => {
         toast({ variant: 'destructive', description: error.message });
         setLoading(false);
+        router.push('/dashboard');
       });
   };
 
