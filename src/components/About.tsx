@@ -1,5 +1,6 @@
 import { Separator } from './ui/separator';
 import ExternalLink from './ExternalLink';
+import InternalLink from './ui/InternalLink';
 
 export default function About() {
   return (
@@ -9,21 +10,27 @@ export default function About() {
       <p>Feel free to reach out if you have any questions.</p>
       <div className="mt-16 flex h-5 space-x-4 items-center justify-center text-sm">
         <ExternalLink text="Email" href="mailto:mdahmed.abdus@gmail.com" />
-        <Separator className="" orientation="vertical" decorative />
+        <Separator orientation="vertical" decorative />
         <ExternalLink
           text="Twitter / X"
           href="https://twitter.com/mdahmed_abdus"
         />
-        <Separator orientation="vertical" />
+        <Separator orientation="vertical" decorative />
         <ExternalLink
           text="LinkedIn"
           href="https://www.linkedin.com/in/mdahmed-abdus/"
         />
       </div>
-      <div className="mt-4 text-sm">
+      <div className="mt-4">
         <ExternalLink
           text="Source code"
           href="https://github.com/mdahmed-abdus"
+        />
+        <br />
+        <InternalLink
+          className="text-sm"
+          href="/credits"
+          text="Credits / Attribution"
         />
       </div>
     </div>
