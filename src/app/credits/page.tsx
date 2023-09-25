@@ -63,6 +63,16 @@ export default function Credits() {
             />
           </p>
         </li>
+        <li className="mt-8">
+          <Label>Icons</Label>
+          <p>
+            <ExternalLink
+              className="h-fit !text-base"
+              href="https://www.radix-ui.com/icons"
+              text="Radix-UI"
+            />
+          </p>
+        </li>
       </ul>
     </div>
   );
