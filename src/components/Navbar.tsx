@@ -43,7 +43,7 @@ export default function Navbar() {
 
   return (
     <nav className="py-4 flex justify-between font-thin">
-      <div>
+      <div onClick={() => setNavToggle(false)}>
         <InternalLink text="simple-txt" href="/" />
       </div>
       <div className="flex flex-col items-end">
