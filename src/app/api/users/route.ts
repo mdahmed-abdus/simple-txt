@@ -1,23 +1,19 @@
 import { User } from '@/models/User';
 import { connectDb } from '@/services/db';
-import { decodeToken } from '@/services/token';
 import { NextRequest, NextResponse } from 'next/server';
+import { isLoggedIn } from '../helpers/auth';
 
 connectDb();
 
 export async function GET(request: NextRequest) {
   try {
-    const token =
-      request.cookies.get(process.env.AUTH_COOKIE_NAME!)?.value || '';
-
-    if (!token) {
+    const userId = isLoggedIn(request);
+    if (!userId) {
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },
         { status: 401 }
       );
     }
-
-    const { userId } = decodeToken(token);
 
     const user = await User.findById(userId).select('-password');
 
