@@ -12,3 +12,7 @@ export function generateAuthToken(tokenData: {
     // TODO: add issuer
   });
 }
+
+export function decodeToken(token: string): any {
+  return jwt.verify(token, TOKEN_SECRET_KEY);
+}
