@@ -1,6 +1,7 @@
 import { User, comparePassword, isVerified } from '@/models/User';
 import { connectDb } from '@/services/db';
 import { NextRequest, NextResponse } from 'next/server';
+import { generateAuthToken } from '@/services/token';
 
 connectDb();
 
@@ -36,8 +37,8 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-    // TODO: implement jwt
-    response.cookies.set(process.env.AUTH_COOKIE_NAME!, 'jwt-token-here', {
+    const token = generateAuthToken({ userId: user._id, email: user.email });
+    response.cookies.set(process.env.AUTH_COOKIE_NAME!, token, {
       httpOnly: true,
     });
 
