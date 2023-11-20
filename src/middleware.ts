@@ -2,7 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const authCookie = request ? request.cookies.get('user-sid') : null;
+  const authCookie = request
+    ? request.cookies.get(process.env.AUTH_COOKIE_NAME!)
+    : null;
   const path = request.nextUrl.pathname;
 
   const isPublicPath = [

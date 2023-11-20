@@ -9,7 +9,10 @@ export async function POST(request: NextRequest) {
       { success: true, message: 'User logged out' },
       { status: 200 }
     );
-    response.cookies.set('token', '', { httpOnly: true, expires: new Date(0) });
+    response.cookies.set(process.env.AUTH_COOKIE_NAME!, '', {
+      httpOnly: true,
+      expires: new Date(0),
+    });
     return response;
   } catch (error: any) {
     console.log(error);

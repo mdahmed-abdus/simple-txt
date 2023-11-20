@@ -37,7 +37,9 @@ export async function POST(request: NextRequest) {
     );
 
     // TODO: implement jwt
-    response.cookies.set('token', 'jwt-token-here', { httpOnly: true });
+    response.cookies.set(process.env.AUTH_COOKIE_NAME!, 'jwt-token-here', {
+      httpOnly: true,
+    });
 
     return response;
   } catch (error: any) {
