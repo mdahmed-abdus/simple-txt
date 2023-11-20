@@ -1,9 +1,9 @@
 import { connectDb } from '@/services/db';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 connectDb();
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const response = NextResponse.json(
       { success: true, message: 'User logged out' },
