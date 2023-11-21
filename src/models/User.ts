@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import { noteSchema } from '@/models/Note';
+import { sendMail } from '@/services/mailService';
+import { Token, hasTokenExpired } from './Token';
 
 const BCRYPT_WORK_FACTOR = 12;
 const DUMMY_HASH =
@@ -51,6 +53,53 @@ export function comparePassword(
   hashedPwd: string = DUMMY_HASH
 ) {
   return bcrypt.compare(plainTextPwd, hashedPwd);
+}
+
+export async function sendConfirmationEmail(user: any) {
+  const token = new Token({
+    userId: user._id,
+    expires: Date.now() + +process.env.EMAIL_VERIFICATION_TIMEOUT!,
+  });
+  await token.save();
+
+  const url = process.env.APP_URL + `/users/email/verify?tokenId=${token._id}`;
+
+  return sendMail({
+    to: user.email,
+    subject: 'Please confirm your email',
+    text: `Please click on this link to verify your email: ${url}`,
+  });
+}
+
+export async function sendPasswordResetEmail(user: any) {
+  const token = new Token({
+    userId: user._id,
+    expires: Date.now() + +process.env.PASSWORD_RESET_TIMEOUT!,
+  });
+  await token.save();
+
+  const url =
+    process.env.APP_URL + `/users/password/reset?tokenId=${token._id}`;
+
+  return sendMail({
+    to: user.email,
+    subject: 'Password reset',
+    text: `Please click on this link to reset your password: ${url}`,
+  });
+}
+
+export async function verifyToken(tokenId: string) {
+  const token = await Token.findById(tokenId);
+
+  if (!token) {
+    return false;
+  }
+  if (hasTokenExpired(token)) {
+    await token.deleteOne();
+    return false;
+  }
+
+  return token;
 }
 
 export const User = mongoose.models.User || mongoose.model('User', userSchema);

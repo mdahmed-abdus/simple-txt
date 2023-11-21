@@ -1,7 +1,6 @@
-import { User, comparePassword, isVerified } from '@/models/User';
+import { User, sendConfirmationEmail } from '@/models/User';
 import { connectDb } from '@/services/db';
 import { NextRequest, NextResponse } from 'next/server';
-import { generateAuthToken } from '@/services/token';
 import { isLoggedIn } from '../../helpers/auth';
 
 connectDb();
@@ -29,7 +28,7 @@ export async function POST(request: NextRequest) {
     const user = new User({ name, email, password });
     await user.save();
 
-    // TODO: send confirmation email
+    await sendConfirmationEmail(user);
 
     return NextResponse.json(
       {

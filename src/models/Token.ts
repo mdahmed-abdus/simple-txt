@@ -11,7 +11,7 @@ export const tokenSchema = new mongoose.Schema({
   },
 });
 
-export function hasExpired(token: any) {
+export function hasTokenExpired(token: any) {
   return Date.now() > token.expires;
 }
 
