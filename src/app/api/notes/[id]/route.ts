@@ -110,9 +110,7 @@ export async function DELETE(
       );
     }
 
-    user.notes = user.notes.filter(
-      (note: any) => note._id.toString() !== params.id
-    );
+    await note.deleteOne();
     await user.save();
 
     return NextResponse.json(
