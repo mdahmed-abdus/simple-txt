@@ -36,7 +36,10 @@ export async function GET(
     );
   } catch (error: any) {
     console.log(error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: 'Something went wrong' },
+      { status: 500 }
+    );
   }
 }
 
@@ -81,7 +84,10 @@ export async function PUT(
     );
   } catch (error: any) {
     console.log(error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { success: false, message: 'Something went wrong' },
+      { status: 500 }
+    );
   }
 }
 
