@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <AuthContextProvider>
-        <body className={rubik.className + ' container'}>
+        <body className={rubik.className + ' container mb-10'}>
           <Navbar />
           <div>{children}</div>
           <Toaster />
