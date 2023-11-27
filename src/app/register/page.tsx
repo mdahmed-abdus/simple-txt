@@ -19,6 +19,7 @@ import InternalLink from '@/components/ui/InternalLink';
 import { registerUser } from '@/services/apiService';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const passwordSchema = z
   .string()
@@ -52,6 +53,7 @@ const formSchema = z
   });
 
 export default function Register() {
+  const [registering, setRegistering] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -93,6 +95,8 @@ export default function Register() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    setRegistering(true);
+
     registerUser(values)
       .then(data => {
         toast({ description: data.message });
@@ -100,7 +104,8 @@ export default function Register() {
       })
       .catch(error =>
         toast({ variant: 'destructive', description: error.message })
-      );
+      )
+      .finally(() => setRegistering(false));
   }
 
   return (
@@ -150,8 +155,12 @@ export default function Register() {
                   )}
                 />
               ))}
-              <Button type="submit" className="mt-16 w-fit">
-                Register
+              <Button
+                type="submit"
+                disabled={registering}
+                className="mt-16 w-fit"
+              >
+                {registering ? 'Registering...' : 'Register'}
               </Button>
             </form>
           </Form>

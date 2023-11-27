@@ -20,6 +20,7 @@ import { loginUser } from '@/services/apiService';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/context/authContext';
+import { useState } from 'react';
 
 const formSchema = z.object({
   email: z
@@ -40,6 +41,7 @@ const formSchema = z.object({
 });
 
 export default function Login() {
+  const [loggingIn, setLoggingIn] = useState(false);
   const { setAuthStatus, setUser } = useAuthContext();
   const router = useRouter();
   const { toast } = useToast();
@@ -65,6 +67,8 @@ export default function Login() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoggingIn(true);
+
     loginUser(values)
       .then(data => {
         toast({ description: data.message });
@@ -76,7 +80,8 @@ export default function Login() {
         toast({ variant: 'destructive', description: error.message });
         setAuthStatus(false);
         setUser({ name: '', email: '' });
-      });
+      })
+      .finally(() => setLoggingIn(false));
   }
 
   return (
@@ -126,8 +131,12 @@ export default function Login() {
                   )}
                 />
               ))}
-              <Button type="submit" className="mt-16 w-fit">
-                Login
+              <Button
+                type="submit"
+                className="mt-16 w-fit"
+                disabled={loggingIn}
+              >
+                {loggingIn ? 'Logging in...' : 'Login'}
               </Button>
               <div className="mt-8 font-thin text-sm">
                 <p>

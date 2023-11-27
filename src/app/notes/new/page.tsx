@@ -11,12 +11,15 @@ import { addNewNote } from '@/services/apiService';
 import { useToast } from '@/components/ui/use-toast';
 
 export default function NewNote() {
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
   const [note, setNote] = useState({ title: '', body: '' });
 
   const saveNote = () => {
+    setSaving(true);
+
     addNewNote(note)
       .then(data => {
         toast({ description: data.message });
@@ -24,7 +27,8 @@ export default function NewNote() {
       })
       .catch(error =>
         toast({ variant: 'destructive', description: error.message })
-      );
+      )
+      .finally(() => setSaving(false));
   };
 
   return (
@@ -54,8 +58,8 @@ export default function NewNote() {
         <Button className="font-normal" variant="link" onClick={router.back}>
           Cancel
         </Button>
-        <Button className="font-normal" onClick={saveNote}>
-          Save
+        <Button className="font-normal" onClick={saveNote} disabled={saving}>
+          {saving ? 'Saving...' : 'Save'}
         </Button>
       </div>
     </div>
