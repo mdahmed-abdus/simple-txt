@@ -28,7 +28,7 @@ const formSchema = z.object({
     .trim()
     .email({ message: 'Invalid email address' })
     .min(8, { message: 'Email must be at least 8 characters' })
-    .max(254, { message: 'Email must be at most 128 characters' }),
+    .max(254, { message: 'Email must be at most 254 characters' }),
   password: z
     .string()
     .trim()
