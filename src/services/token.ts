@@ -14,5 +14,9 @@ export function generateAuthToken(tokenData: {
 }
 
 export function decodeToken(token: string): any {
-  return jwt.verify(token, TOKEN_SECRET_KEY);
+  try {
+    return jwt.verify(token, TOKEN_SECRET_KEY);
+  } catch {
+    return false;
+  }
 }
