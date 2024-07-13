@@ -8,9 +8,20 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
 import { sendVerificationEmail, verifyEmail } from '@/services/apiService';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 export default function VerifyEmail() {
+  return (
+    <div className="container mt-16 md:mt-32 text-center font-thin">
+      <h1 className="text-3xl text-center font-normal">Verify your email</h1>
+      <Suspense>
+        <PageContent />
+      </Suspense>
+    </div>
+  );
+}
+
+function PageContent() {
   const searchParams = useSearchParams();
   const tokenId = searchParams.get('tokenId');
   const { toast } = useToast();
@@ -57,28 +68,23 @@ export default function VerifyEmail() {
     }
   };
 
-  return (
-    <div className="container mt-16 md:mt-32 text-center font-thin">
-      <h1 className="text-3xl text-center font-normal">Verify your email</h1>
-      {loading ? (
-        <Skeleton className="mt-4 w-1/2 h-[50px] mx-auto" />
-      ) : tokenId ? (
-        <WithToken
-          verificationStatus={verificationStatus}
-          email={email}
-          setEmail={setEmail}
-          onSubmit={onSubmit}
-          sendingEmail={sendingEmail}
-        />
-      ) : (
-        <WithoutToken
-          email={email}
-          setEmail={setEmail}
-          onSubmit={onSubmit}
-          sendingEmail={sendingEmail}
-        />
-      )}
-    </div>
+  return loading ? (
+    <Skeleton className="mt-4 w-1/2 h-[50px] mx-auto" />
+  ) : tokenId ? (
+    <WithToken
+      verificationStatus={verificationStatus}
+      email={email}
+      setEmail={setEmail}
+      onSubmit={onSubmit}
+      sendingEmail={sendingEmail}
+    />
+  ) : (
+    <WithoutToken
+      email={email}
+      setEmail={setEmail}
+      onSubmit={onSubmit}
+      sendingEmail={sendingEmail}
+    />
   );
 }
 
