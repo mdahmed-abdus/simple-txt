@@ -36,14 +36,14 @@ const formSchema = z
     name: z
       .string()
       .trim()
-      .min(3, { message: 'Name must be at least 2 characters' })
+      .min(3, { message: 'Name must be at least 3 characters' })
       .max(128, { message: 'Name must be at most 128 characters' }),
     email: z
       .string()
       .trim()
       .email({ message: 'Invalid email address' })
       .min(8, { message: 'Email must be at least 8 characters' })
-      .max(254, { message: 'Email must be at most 128 characters' }),
+      .max(254, { message: 'Email must be at most 254 characters' }),
     password: passwordSchema,
     confirmPassword: passwordSchema,
   })

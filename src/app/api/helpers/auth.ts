@@ -12,3 +12,5 @@ export function isLoggedIn(request: NextRequest) {
 
   return userId ? userId : false;
 }
+
+export const dynamic = 'force-dynamic';

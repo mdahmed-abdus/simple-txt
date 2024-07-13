@@ -7,9 +7,20 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
 import { resetPassword, sendPasswordResetEmail } from '@/services/apiService';
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 
 export default function PasswordReset() {
+  return (
+    <div className="container mt-16 md:mt-32 text-center font-thin">
+      <h1 className="text-3xl text-center font-normal">Reset your password</h1>
+      <Suspense>
+        <PageContent />
+      </Suspense>
+    </div>
+  );
+}
+
+function PageContent() {
   const searchParams = useSearchParams();
   const tokenId = searchParams.get('tokenId');
   const { toast } = useToast();
@@ -64,26 +75,21 @@ export default function PasswordReset() {
       });
   };
 
-  return (
-    <div className="container mt-16 md:mt-32 text-center font-thin">
-      <h1 className="text-3xl text-center font-normal">Reset your password</h1>
-      {tokenId ? (
-        <WithToken
-          password={password}
-          confirmPassword={confirmPassword}
-          setPassword={setPassword}
-          setConfirmPassword={setConfirmPassword}
-          onSubmit={onSubmitPasswordReset}
-        />
-      ) : (
-        <WithoutToken
-          email={email}
-          setEmail={setEmail}
-          onSubmit={onSubmit}
-          sendingEmail={sendingEmail}
-        />
-      )}
-    </div>
+  return tokenId ? (
+    <WithToken
+      password={password}
+      confirmPassword={confirmPassword}
+      setPassword={setPassword}
+      setConfirmPassword={setConfirmPassword}
+      onSubmit={onSubmitPasswordReset}
+    />
+  ) : (
+    <WithoutToken
+      email={email}
+      setEmail={setEmail}
+      onSubmit={onSubmit}
+      sendingEmail={sendingEmail}
+    />
   );
 }
 
