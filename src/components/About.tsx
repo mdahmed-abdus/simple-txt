@@ -12,11 +12,6 @@ export default function About() {
         <ExternalLink text="Email" href="mailto:mdahmed.abdus@gmail.com" />
         <Separator orientation="vertical" decorative />
         <ExternalLink
-          text="Twitter / X"
-          href="https://twitter.com/mdahmed_abdus"
-        />
-        <Separator orientation="vertical" decorative />
-        <ExternalLink
           text="LinkedIn"
           href="https://www.linkedin.com/in/mdahmed-abdus/"
         />
@@ -24,7 +19,7 @@ export default function About() {
       <div className="mt-4">
         <ExternalLink
           text="Source code"
-          href="https://github.com/mdahmed-abdus"
+          href="https://github.com/mdahmed-abdus/simple-txt"
         />
         <br />
         <InternalLink
