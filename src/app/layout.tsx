@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { Rubik } from 'next/font/google';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthContextProvider } from '@/context/authContext';
+import WelcomeCookie from '@/components/WelcomeCookie';
 
 const rubik = Rubik({ subsets: ['latin'] });
 
@@ -24,6 +25,7 @@ export default function RootLayout({
           <Navbar />
           <div>{children}</div>
           <Toaster />
+          <WelcomeCookie />
         </body>
       </AuthContextProvider>
     </html>
