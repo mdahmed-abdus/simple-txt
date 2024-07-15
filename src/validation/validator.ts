@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
-export function validate(schema: z.ZodObject<any>, data: any) {
+export function validate(
+  schema: z.ZodObject<any> | z.ZodEffects<z.ZodObject<any>>,
+  data: any
+) {
   const { success, error } = schema.safeParse(data);
 
   if (success) {
