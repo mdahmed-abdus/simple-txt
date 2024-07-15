@@ -6,6 +6,8 @@ import { Note } from '@/models/Note';
 
 connectDb();
 
+// GET /api/notes
+// get all notes
 export async function GET(request: NextRequest) {
   try {
     const userId = isLoggedIn(request);
@@ -31,6 +33,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// POST /api/notes
+// add new note
 export async function POST(request: NextRequest) {
   try {
     const userId = isLoggedIn(request);

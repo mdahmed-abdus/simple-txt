@@ -2,6 +2,8 @@ import { isLoggedIn } from '@/app/api/helpers/auth';
 import { User, verifyToken, isVerified } from '@/models/User';
 import { NextRequest, NextResponse } from 'next/server';
 
+// POST /api/users/password/reset
+// resets user password
 export async function POST(request: NextRequest) {
   try {
     // prevent access to authorized users

@@ -2,6 +2,8 @@ import { isLoggedIn } from '@/app/api/helpers/auth';
 import { User, isVerified, sendConfirmationEmail } from '@/models/User';
 import { NextRequest, NextResponse } from 'next/server';
 
+// POST /api/users/email/resend
+// send email with verification link
 export async function POST(request: NextRequest) {
   try {
     // prevent access to authorized users

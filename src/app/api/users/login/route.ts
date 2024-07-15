@@ -6,6 +6,8 @@ import { isLoggedIn } from '../../helpers/auth';
 
 connectDb();
 
+// POST /api/users/login
+// logs in user
 export async function POST(request: NextRequest) {
   try {
     // prevent access to authorized users

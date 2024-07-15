@@ -5,6 +5,8 @@ import { isLoggedIn } from '../helpers/auth';
 
 connectDb();
 
+// GET /api/users
+// get user details
 export async function GET(request: NextRequest) {
   try {
     const userId = isLoggedIn(request);

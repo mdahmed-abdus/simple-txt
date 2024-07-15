@@ -5,6 +5,8 @@ import { isLoggedIn } from '../../helpers/auth';
 
 connectDb();
 
+// GET /api/notes/[id]
+// get note by id
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -43,6 +45,8 @@ export async function GET(
   }
 }
 
+// PUT /api/notes/[id]
+// update note by id
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -91,6 +95,8 @@ export async function PUT(
   }
 }
 
+// DELETE /api/notes/[id]
+// delete note by id
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }

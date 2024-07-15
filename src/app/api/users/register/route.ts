@@ -5,6 +5,8 @@ import { isLoggedIn } from '../../helpers/auth';
 
 connectDb();
 
+// POST /api/users/register
+// register new user
 export async function POST(request: NextRequest) {
   try {
     // prevent access to authorized users
