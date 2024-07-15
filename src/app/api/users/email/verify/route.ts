@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     }
 
     const token = await verifyToken(tokenId);
-    console.log(token);
+
     if (!token) {
       return NextResponse.json({ message: 'Invalid token' }, { status: 400 });
     }
