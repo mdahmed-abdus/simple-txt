@@ -3,6 +3,8 @@ import { connectDb } from '@/services/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { generateAuthToken } from '@/services/token';
 import { isLoggedIn } from '../../helpers/auth';
+import { validate } from '@/validation/validator';
+import { loginSchema } from '@/validation/validationSchemas';
 
 connectDb();
 
@@ -20,6 +22,15 @@ export async function POST(request: NextRequest) {
 
     const reqBody = await request.json();
     const { email, password } = reqBody;
+
+    const { success, errorMessage } = validate(loginSchema, {
+      email,
+      password,
+    });
+
+    if (!success) {
+      return NextResponse.json({ message: errorMessage }, { status: 400 });
+    }
 
     const user = await User.findOne({ email });
     const validPassword = await comparePassword(password, user?.password);

@@ -3,6 +3,8 @@ import { connectDb } from '@/services/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { isLoggedIn } from '../helpers/auth';
 import { Note } from '@/models/Note';
+import { validate } from '@/validation/validator';
+import { noteSchema } from '@/validation/validationSchemas';
 
 connectDb();
 
@@ -47,6 +49,12 @@ export async function POST(request: NextRequest) {
 
     const reqBody = await request.json();
     const { title, body } = reqBody;
+
+    const { success, errorMessage } = validate(noteSchema, { title, body });
+
+    if (!success) {
+      return NextResponse.json({ message: errorMessage }, { status: 400 });
+    }
 
     const user = await User.findById(userId);
     const note = new Note({ title, body });

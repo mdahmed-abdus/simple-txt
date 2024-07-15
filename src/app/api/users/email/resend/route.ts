@@ -1,5 +1,7 @@
 import { isLoggedIn } from '@/app/api/helpers/auth';
 import { User, isVerified, sendConfirmationEmail } from '@/models/User';
+import { emailVerificationSchema } from '@/validation/validationSchemas';
+import { validate } from '@/validation/validator';
 import { NextRequest, NextResponse } from 'next/server';
 
 // POST /api/users/email/resend
@@ -15,7 +17,17 @@ export async function POST(request: NextRequest) {
     }
 
     const reqBody = await request.json();
-    const user = await User.findOne({ email: reqBody.email });
+    const { email } = reqBody;
+
+    const { success, errorMessage } = validate(emailVerificationSchema, {
+      email,
+    });
+
+    if (!success) {
+      return NextResponse.json({ message: errorMessage }, { status: 400 });
+    }
+
+    const user = await User.findOne({ email });
 
     if (!user) {
       return NextResponse.json(

@@ -2,6 +2,8 @@ import { User, sendConfirmationEmail } from '@/models/User';
 import { connectDb } from '@/services/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { isLoggedIn } from '../../helpers/auth';
+import { validate } from '@/validation/validator';
+import { userRegisterSchema } from '@/validation/validationSchemas';
 
 connectDb();
 
@@ -18,7 +20,18 @@ export async function POST(request: NextRequest) {
     }
 
     const reqBody = await request.json();
-    const { name, email, password } = reqBody;
+    const { name, email, password, confirmPassword } = reqBody;
+
+    const { success, errorMessage } = validate(userRegisterSchema, {
+      name,
+      email,
+      password,
+      confirmPassword,
+    });
+
+    if (!success) {
+      return NextResponse.json({ message: errorMessage }, { status: 400 });
+    }
 
     if (await User.exists({ email })) {
       return NextResponse.json(

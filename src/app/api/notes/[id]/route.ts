@@ -2,6 +2,8 @@ import { User } from '@/models/User';
 import { connectDb } from '@/services/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { isLoggedIn } from '../../helpers/auth';
+import { noteSchema } from '@/validation/validationSchemas';
+import { validate } from '@/validation/validator';
 
 connectDb();
 
@@ -77,6 +79,15 @@ export async function PUT(
     // if updated title not provided then use the old title
     // if updated body not provided then use the old body
     const { title = note.title, body = note.body } = reqBody;
+
+    const { success, errorMessage } = validate(noteSchema, {
+      title,
+      body,
+    });
+
+    if (!success) {
+      return NextResponse.json({ message: errorMessage }, { status: 400 });
+    }
 
     note.title = title;
     note.body = body;

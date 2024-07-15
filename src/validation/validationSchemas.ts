@@ -25,8 +25,16 @@ const password = z
 
 export const noteSchema = z
   .object({
-    title: z.string().trim().min(3).max(60),
-    body: z.string().trim().min(3).max(1_000),
+    title: z
+      .string()
+      .trim()
+      .min(3, { message: 'Title must be at least 3 characters' })
+      .max(60, { message: 'Title must be at most 60 characters' }),
+    body: z
+      .string()
+      .trim()
+      .min(3, { message: 'Body must be at least 3 characters' })
+      .max(1_000, { message: 'Body must be at most 1,000 characters' }),
   })
   .required();
 
