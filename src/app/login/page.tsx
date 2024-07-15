@@ -17,28 +17,11 @@ import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import InternalLink from '@/components/ui/InternalLink';
 import { loginUser } from '@/services/apiService';
+import { loginSchema } from '@/validation/validationSchemas';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/context/authContext';
 import { useState } from 'react';
-
-const formSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .email({ message: 'Invalid email address' })
-    .min(8, { message: 'Email must be at least 8 characters' })
-    .max(254, { message: 'Email must be at most 254 characters' }),
-  password: z
-    .string()
-    .trim()
-    .regex(/^(?=.*?[\p{Lu}])(?=.*?[\p{Ll}])(?=.*?\d).*$/u, {
-      message:
-        'Password must contain at least: 1 uppercase, 1 lowercase, 1 digit',
-    })
-    .min(8, { message: 'Password must be at least 8 characters' })
-    .max(72, { message: 'Password must be at most 72 characters' }),
-});
 
 export default function Login() {
   const [loggingIn, setLoggingIn] = useState(false);
@@ -61,12 +44,12 @@ export default function Login() {
     },
   ];
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof loginSchema>) {
     setLoggingIn(true);
 
     loginUser(values)

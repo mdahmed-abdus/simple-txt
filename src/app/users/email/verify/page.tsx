@@ -7,6 +7,8 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
 import { sendVerificationEmail, verifyEmail } from '@/services/apiService';
+import { emailVerificationSchema } from '@/validation/validationSchemas';
+import { validate } from '@/validation/validator';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
@@ -52,7 +54,11 @@ function PageContent() {
   }, []);
 
   const onSubmit = () => {
-    if (email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+    const { success, errorMessage } = validate(emailVerificationSchema, {
+      email,
+    });
+
+    if (success) {
       setSendingEmail(true);
       sendVerificationEmail(email)
         .then(data => {
@@ -64,7 +70,10 @@ function PageContent() {
           setSendingEmail(false);
         });
     } else {
-      toast({ variant: 'destructive', description: 'Invalid email' });
+      toast({
+        variant: 'destructive',
+        description: errorMessage || 'Invalid email or already verified',
+      });
     }
   };
 

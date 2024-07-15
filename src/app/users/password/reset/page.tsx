@@ -6,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
 import { resetPassword, sendPasswordResetEmail } from '@/services/apiService';
+import { passwordResetSchema } from '@/validation/validationSchemas';
+import { validate } from '@/validation/validator';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 
@@ -31,7 +33,9 @@ function PageContent() {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const onSubmit = () => {
-    if (email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+    const { success, errorMessage } = validate(passwordResetSchema, { email });
+
+    if (success) {
       setSendingEmail(true);
       sendPasswordResetEmail(email)
         .then(data => {
@@ -43,7 +47,10 @@ function PageContent() {
           setSendingEmail(false);
         });
     } else {
-      toast({ variant: 'destructive', description: 'Invalid email' });
+      toast({
+        variant: 'destructive',
+        description: errorMessage || 'Invalid email or email not verified',
+      });
     }
   };
 

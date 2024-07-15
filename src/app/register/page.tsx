@@ -17,40 +17,10 @@ import { Separator } from '@/components/ui/separator';
 import Image from 'next/image';
 import InternalLink from '@/components/ui/InternalLink';
 import { registerUser } from '@/services/apiService';
+import { userRegisterSchema } from '@/validation/validationSchemas';
 import { useToast } from '@/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-
-const passwordSchema = z
-  .string()
-  .trim()
-  .regex(/^(?=.*?[\p{Lu}])(?=.*?[\p{Ll}])(?=.*?\d).*$/u, {
-    message:
-      'Password must contain at least: 1 uppercase, 1 lowercase, 1 digit',
-  })
-  .min(8, { message: 'Password must be at least 8 characters' })
-  .max(72, { message: 'Password must be at most 72 characters' });
-
-const formSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .min(3, { message: 'Name must be at least 3 characters' })
-      .max(128, { message: 'Name must be at most 128 characters' }),
-    email: z
-      .string()
-      .trim()
-      .email({ message: 'Invalid email address' })
-      .min(8, { message: 'Email must be at least 8 characters' })
-      .max(254, { message: 'Email must be at most 254 characters' }),
-    password: passwordSchema,
-    confirmPassword: passwordSchema,
-  })
-  .refine(data => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  });
 
 export default function Register() {
   const [registering, setRegistering] = useState(false);
@@ -84,8 +54,8 @@ export default function Register() {
     },
   ];
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof userRegisterSchema>>({
+    resolver: zodResolver(userRegisterSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -94,7 +64,7 @@ export default function Register() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof userRegisterSchema>) {
     setRegistering(true);
 
     registerUser(values)
