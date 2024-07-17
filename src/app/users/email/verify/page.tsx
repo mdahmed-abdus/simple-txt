@@ -8,9 +8,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/components/ui/use-toast';
 import { sendVerificationEmail, verifyEmail } from '@/services/apiService';
 import { emailVerificationSchema } from '@/validation/validationSchemas';
-import { validate } from '@/validation/validator';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 export default function VerifyEmail() {
   return (
@@ -30,7 +39,6 @@ function PageContent() {
 
   const [loading, setLoading] = useState(true);
   const [sendingEmail, setSendingEmail] = useState(false);
-  const [email, setEmail] = useState('');
   const [verificationStatus, setVerificationStatus] = useState(false);
 
   useEffect(() => {
@@ -40,41 +48,29 @@ function PageContent() {
         .then(data => {
           toast({ description: data.message });
           setVerificationStatus(true);
-          setLoading(false);
         })
         .catch(error => {
           toast({ variant: 'destructive', description: error.message });
           setVerificationStatus(false);
-          setLoading(false);
-        });
+        })
+        .finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onSubmit = () => {
-    const { success, errorMessage } = validate(emailVerificationSchema, {
-      email,
-    });
-
-    if (success) {
-      setSendingEmail(true);
-      sendVerificationEmail(email)
-        .then(data => {
-          toast({ description: data.message });
-          setSendingEmail(false);
-        })
-        .catch(error => {
-          toast({ variant: 'destructive', description: error.message });
-          setSendingEmail(false);
-        });
-    } else {
-      toast({
-        variant: 'destructive',
-        description: errorMessage || 'Invalid email or already verified',
+  const sendEmail = (email: string) => {
+    setSendingEmail(true);
+    sendVerificationEmail(email)
+      .then(data => {
+        toast({ description: data.message });
+        setSendingEmail(false);
+      })
+      .catch(error => {
+        toast({ variant: 'destructive', description: error.message });
+        setSendingEmail(false);
       });
-    }
   };
 
   return loading ? (
@@ -82,28 +78,15 @@ function PageContent() {
   ) : tokenId ? (
     <WithToken
       verificationStatus={verificationStatus}
-      email={email}
-      setEmail={setEmail}
-      onSubmit={onSubmit}
+      sendEmail={sendEmail}
       sendingEmail={sendingEmail}
     />
   ) : (
-    <WithoutToken
-      email={email}
-      setEmail={setEmail}
-      onSubmit={onSubmit}
-      sendingEmail={sendingEmail}
-    />
+    <WithoutToken sendEmail={sendEmail} sendingEmail={sendingEmail} />
   );
 }
 
-function WithToken({
-  verificationStatus,
-  email,
-  setEmail,
-  onSubmit,
-  sendingEmail,
-}: any) {
+function WithToken({ verificationStatus, sendEmail, sendingEmail }: any) {
   return (
     <div className="mt-4 text-center font-thin">
       {verificationStatus ? (
@@ -118,16 +101,7 @@ function WithToken({
           </p>
           <div className="mt-16">
             <p>Enter your email and we will send a new verification link.</p>
-            <Input
-              className="mt-4 mx-auto p-2 md:w-1/2 text-center border-0"
-              value={email}
-              placeholder="Enter your email"
-              onChange={e => setEmail(e.target.value)}
-            />
-            <Separator className="mx-auto md:w-1/2" />
-            <Button className="mt-4" onClick={onSubmit} disabled={sendingEmail}>
-              {sendingEmail ? 'Sending email' : 'Submit'}
-            </Button>
+            <EmailForm sendingEmail={sendingEmail} sendEmail={sendEmail} />
           </div>
         </>
       )}
@@ -135,7 +109,7 @@ function WithToken({
   );
 }
 
-function WithoutToken({ email, setEmail, onSubmit, sendingEmail }: any) {
+function WithoutToken({ sendEmail, sendingEmail }: any) {
   return (
     <>
       <p className="mt-4 text-center font-thin">
@@ -144,17 +118,53 @@ function WithoutToken({ email, setEmail, onSubmit, sendingEmail }: any) {
       <div className="mt-16">
         <p>Did not receive the email?</p>
         <p>Enter your email and we will send it again.</p>
-        <Input
-          className="mt-4 mx-auto p-2 md:w-1/2 text-center border-0"
-          value={email}
-          placeholder="Enter your email"
-          onChange={e => setEmail(e.target.value)}
-        />
-        <Separator className="mx-auto md:w-1/2" />
-        <Button className="mt-4" onClick={onSubmit} disabled={sendingEmail}>
-          {sendingEmail ? 'Sending email' : 'Submit'}
-        </Button>
+        <EmailForm sendingEmail={sendingEmail} sendEmail={sendEmail} />
       </div>
     </>
+  );
+}
+
+function EmailForm({ sendingEmail, sendEmail }: any) {
+  const form = useForm<z.infer<typeof emailVerificationSchema>>({
+    resolver: zodResolver(emailVerificationSchema),
+    defaultValues: { email: '' },
+  });
+
+  const onSubmit = (values: z.infer<typeof emailVerificationSchema>) => {
+    sendEmail(values.email);
+  };
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col items-center"
+      >
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="mt-4 w-full">
+              <FormControl>
+                <Input
+                  className="mt-4 mx-auto md:w-1/2 text-center border-0"
+                  type="email"
+                  autoComplete="on"
+                  placeholder="Enter your email"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+              <Separator className="mx-auto md:w-1/2" />
+            </FormItem>
+          )}
+        />
+        <div className="mt-16 text-center">
+          <Button type="submit" className="mt-4" disabled={sendingEmail}>
+            {sendingEmail ? 'Sending email' : 'Submit'}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 }

@@ -24,6 +24,18 @@ import {
 } from '@/services/apiService';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/use-toast';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { noteSchema } from '@/validation/validationSchemas';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 
 export default function NoteById({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -32,11 +44,9 @@ export default function NoteById({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [note, setNote] = useState({ _id: '', title: '', body: '' });
-  const [updatedNote, setUpdatedNote] = useState({
-    _id: '',
-    title: '',
-    body: '',
-  });
+
+  const enterEditMode = () => setEditMode(true);
+  const exitEditMode = () => setEditMode(false);
 
   const loadNote = () => {
     setLoading(true);
@@ -47,7 +57,6 @@ export default function NoteById({ params }: { params: { id: string } }) {
       })
       .catch(error => {
         toast({ variant: 'destructive', description: error.message });
-        setLoading(false);
         router.push('/dashboard');
       });
   };
@@ -57,11 +66,6 @@ export default function NoteById({ params }: { params: { id: string } }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-
-  const editNote = () => {
-    setUpdatedNote(note);
-    setEditMode(!editMode);
-  };
 
   const deleteNote = () => {
     deleteNoteById(note._id)
@@ -74,15 +78,15 @@ export default function NoteById({ params }: { params: { id: string } }) {
       );
   };
 
-  const updateNote = () => {
+  const updateNote = (values: { title: string; body: string }) => {
     updateNoteById(note._id, {
-      title: updatedNote.title,
-      body: updatedNote.body,
+      title: values.title,
+      body: values.body,
     })
       .then(data => {
         toast({ description: data.message });
         loadNote();
-        setEditMode(!editMode);
+        exitEditMode();
       })
       .catch(error =>
         toast({ variant: 'destructive', description: error.message })
@@ -99,79 +103,20 @@ export default function NoteById({ params }: { params: { id: string } }) {
       ) : (
         <div className="md:w-3/4 md:mx-auto">
           {editMode ? (
-            <Input
-              className="p-2 h-fit text-3xl text-center"
-              value={updatedNote.title}
-              onChange={e =>
-                setUpdatedNote({ ...updatedNote, title: e.target.value })
-              }
+            <EditNoteForm
+              note={note}
+              loading={loading}
+              setLoading={setLoading}
+              updateNote={updateNote}
+              exitEditMode={exitEditMode}
             />
           ) : (
-            <h1 className="p-2 text-3xl border border-transparent text-center">
-              {note.title}
-            </h1>
+            <ShowNote
+              note={note}
+              deleteNote={deleteNote}
+              enterEditMode={enterEditMode}
+            />
           )}
-          <div className="mt-8 font-thin">
-            {editMode ? (
-              <Textarea
-                className="p-2 text-base"
-                value={updatedNote.body}
-                onChange={e =>
-                  setUpdatedNote({ ...updatedNote, body: e.target.value })
-                }
-              />
-            ) : (
-              <p className="p-2 border border-transparent">{note.body}</p>
-            )}
-          </div>
-          <div className="text-center">
-            <Button
-              className="mt-16 font-normal"
-              variant="link"
-              onClick={editNote}
-            >
-              {editMode ? 'Cancel & exit edit mode' : 'Edit'}
-            </Button>
-            {editMode ? (
-              <Button
-                className="font-normal"
-                variant="link"
-                onClick={updateNote}
-              >
-                Update
-              </Button>
-            ) : (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    className="text-destructive font-normal"
-                    variant="link"
-                  >
-                    Delete
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you sure you want to delete?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone.
-                      <br />
-                      This will permanently delete the note titled -{' '}
-                      {note.title}.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={deleteNote}>
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-          </div>
         </div>
       )}
       <div className="text-center">
@@ -182,5 +127,138 @@ export default function NoteById({ params }: { params: { id: string } }) {
         />
       </div>
     </div>
+  );
+}
+
+function EditNoteForm({
+  note,
+  loading,
+  setLoading,
+  exitEditMode,
+  updateNote,
+}: any) {
+  const formFields = [
+    {
+      name: 'title' as const,
+      label: 'Title',
+      inputType: 'text',
+      inputPlaceholder: 'Enter note title',
+    },
+    {
+      name: 'body' as const,
+      label: 'Body',
+      inputType: 'text',
+      inputPlaceholder: 'Enter note body',
+    },
+  ];
+
+  const form = useForm<z.infer<typeof noteSchema>>({
+    resolver: zodResolver(noteSchema),
+    defaultValues: { title: note.title, body: note.body },
+  });
+
+  const onSubmit = (values: z.infer<typeof noteSchema>) => {
+    setLoading(true);
+    updateNote(values);
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        {formFields.map((formField, index) => (
+          <FormField
+            key={`editNoteFormFormField_${index}`}
+            control={form.control}
+            name={formField.name}
+            render={({ field }) => (
+              <FormItem className="mt-4 w-full">
+                <FormLabel>{formField.label}</FormLabel>
+                <FormControl>
+                  {formField.name === 'body' ? (
+                    <Textarea
+                      className="border-0 p-0 min-h-fit"
+                      placeholder={formField.inputPlaceholder}
+                      {...field}
+                    />
+                  ) : (
+                    <Input
+                      className="border-0 p-0"
+                      type={formField.inputType}
+                      autoComplete="on"
+                      placeholder={formField.inputPlaceholder}
+                      {...field}
+                    />
+                  )}
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        ))}
+        <div className="text-center">
+          <Button
+            className="mt-16 font-normal"
+            variant="link"
+            disabled={loading}
+            onClick={exitEditMode}
+          >
+            Cancel & exit edit mode
+          </Button>
+          <Button
+            type="submit"
+            className="font-normal"
+            variant="link"
+            disabled={loading}
+          >
+            Update
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+}
+
+function ShowNote({ note, deleteNote, enterEditMode }: any) {
+  return (
+    <>
+      <h1 className="p-2 text-3xl border border-transparent text-center">
+        {note.title}
+      </h1>
+      <div className="mt-8 font-thin">
+        <p className="p-2 border border-transparent">{note.body}</p>
+      </div>
+      <div className="text-center">
+        <Button
+          className="mt-16 font-normal"
+          variant="link"
+          onClick={enterEditMode}
+        >
+          Edit
+        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button className="text-destructive font-normal" variant="link">
+              Delete
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                Are you sure you want to delete?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone.
+                <br />
+                This will permanently delete the note titled - {note.title}.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={deleteNote}>Delete</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </>
   );
 }
