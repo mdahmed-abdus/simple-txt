@@ -167,7 +167,7 @@ function EditNoteForm({
       <form onSubmit={form.handleSubmit(onSubmit)}>
         {formFields.map((formField, index) => (
           <FormField
-            key={`editNoteFormFormField_${index}`}
+            key={`editNoteFormField_${index}`}
             control={form.control}
             name={formField.name}
             render={({ field }) => (

@@ -73,7 +73,7 @@ export default function NewNote() {
           >
             {formFields.map((formField, index) => (
               <FormField
-                key={`newNoteFormFormField_${index}`}
+                key={`newNoteFormField_${index}`}
                 control={form.control}
                 name={formField.name}
                 render={({ field }) => (

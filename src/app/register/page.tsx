@@ -104,7 +104,7 @@ export default function Register() {
             >
               {formFields.map((formField, index) => (
                 <FormField
-                  key={`registerFormFormField_${index}`}
+                  key={`registerFormField_${index}`}
                   control={form.control}
                   name={formField.name}
                   render={({ field }) => (

@@ -166,7 +166,7 @@ export default function Profile() {
             >
               {formFields.map((formField, index) => (
                 <FormField
-                  key={`loginFormFormField_${index}`}
+                  key={`profileFormField_${index}`}
                   control={form.control}
                   name={formField.name}
                   render={({ field }) => (

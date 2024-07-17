@@ -121,7 +121,7 @@ export default function Dashboard() {
         </TableHeader>
         <TableBody>
           {notes.map(({ _id, title, body }, index) => (
-            <TableRow key={`dashboardTableRow_${_id}`}>
+            <TableRow key={`dashboard2TableRow_${_id}`}>
               <TableCell onClick={() => router.push(`notes/${_id}`)}>
                 <p className="text-xs">No. {index + 1}</p>
                 <p className="font-normal mt-2">{title}</p>

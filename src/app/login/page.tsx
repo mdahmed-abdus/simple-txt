@@ -93,7 +93,7 @@ export default function Login() {
             >
               {formFields.map((formField, index) => (
                 <FormField
-                  key={`loginFormFormField_${index}`}
+                  key={`loginFormField_${index}`}
                   control={form.control}
                   name={formField.name}
                   render={({ field }) => (
