@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Separator } from '@/components/ui/separator';
 import InternalLink from '@/components/ui/InternalLink';
 import {
   deleteNoteById,
@@ -191,6 +192,7 @@ function EditNoteForm({
                   )}
                 </FormControl>
                 <FormMessage />
+                <Separator />
               </FormItem>
             )}
           />
@@ -218,14 +220,26 @@ function EditNoteForm({
   );
 }
 
-function ShowNote({ note, deleteNote, enterEditMode }: any) {
+function ShowNote({
+  note,
+  deleteNote,
+  enterEditMode,
+}: {
+  note: { _id: string; title: string; body: string };
+  deleteNote: () => void;
+  enterEditMode: () => void;
+}) {
   return (
     <>
       <h1 className="p-2 text-3xl border border-transparent text-center">
         {note.title}
       </h1>
-      <div className="mt-8 font-thin">
-        <p className="p-2 border border-transparent">{note.body}</p>
+      <div className="mt-8 font-thin p-2">
+        {note.body.split('\n').map((p, i) => (
+          <p key={`noteBodyP_${i}`} className="border border-transparent">
+            {p}
+          </p>
+        ))}
       </div>
       <div className="text-center">
         <Button
