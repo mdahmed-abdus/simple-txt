@@ -1,4 +1,5 @@
 import { isLoggedIn } from '@/app/api/helpers/auth';
+import { validateId } from '@/app/api/helpers/validateId';
 import { User, verifyToken, isVerified } from '@/models/User';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -21,6 +22,10 @@ export async function POST(request: NextRequest) {
         { message: 'Token not provided' },
         { status: 400 }
       );
+    }
+
+    if (!validateId(tokenId)) {
+      return NextResponse.json({ message: 'Invalid token' }, { status: 400 });
     }
 
     const token = await verifyToken(tokenId);

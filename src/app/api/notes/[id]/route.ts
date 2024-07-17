@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isLoggedIn } from '../../helpers/auth';
 import { noteSchema } from '@/validation/validationSchemas';
 import { validate } from '@/validation/validator';
+import { validateId } from '../../helpers/validateId';
 
 connectDb();
 
@@ -19,6 +20,13 @@ export async function GET(
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+
+    if (!validateId(params.id)) {
+      return NextResponse.json(
+        { message: 'Note with given id was not found' },
+        { status: 400 }
       );
     }
 
@@ -59,6 +67,13 @@ export async function PUT(
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+
+    if (!validateId(params.id)) {
+      return NextResponse.json(
+        { message: 'Note with given id was not found' },
+        { status: 400 }
       );
     }
 
@@ -118,6 +133,13 @@ export async function DELETE(
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+
+    if (!validateId(params.id)) {
+      return NextResponse.json(
+        { message: 'Note with given id was not found' },
+        { status: 400 }
       );
     }
 
