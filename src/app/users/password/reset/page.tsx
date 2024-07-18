@@ -2,16 +2,28 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/components/ui/use-toast';
 import { resetPassword, sendPasswordResetEmail } from '@/services/apiService';
-import { passwordResetSchema } from '@/validation/validationSchemas';
-import { validate } from '@/validation/validator';
+import {
+  newPasswordResetSchema,
+  passwordResetSchema,
+} from '@/validation/validationSchemas';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-export default function PasswordReset() {
+export default function VerifyEmail() {
   return (
     <div className="container mt-16 md:mt-32 text-center font-thin">
       <h1 className="text-3xl text-center font-normal">Reset your password</h1>
@@ -27,112 +39,113 @@ function PageContent() {
   const tokenId = searchParams.get('tokenId');
   const { toast } = useToast();
 
-  const [sendingEmail, setSendingEmail] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = () => {
-    const { success, errorMessage } = validate(passwordResetSchema, { email });
-
-    if (success) {
-      setSendingEmail(true);
-      sendPasswordResetEmail(email)
-        .then(data => {
-          toast({ description: data.message });
-          setSendingEmail(false);
-        })
-        .catch(error => {
-          toast({ variant: 'destructive', description: error.message });
-          setSendingEmail(false);
-        });
-    } else {
-      toast({
-        variant: 'destructive',
-        description: errorMessage || 'Invalid email or email not verified',
-      });
-    }
+  const passwordReset = (values: {
+    password: string;
+    confirmPassword: string;
+  }) => {
+    setLoading(true);
+    resetPassword(tokenId!, values)
+      .then(data => toast({ description: data.message }))
+      .catch(error =>
+        toast({ variant: 'destructive', description: error.message })
+      )
+      .finally(() => setLoading(false));
   };
 
-  const onSubmitPasswordReset = () => {
-    if (!tokenId) {
-      return;
-    }
-
-    if (!password.match(/^(?=.*?[\p{Lu}])(?=.*?[\p{Ll}])(?=.*?\d).*$/u)) {
-      toast({
-        variant: 'destructive',
-        description:
-          'Password must contain at least: 1 uppercase, 1 lowercase, 1 digit',
-      });
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      toast({ variant: 'destructive', description: 'Passwords do not match' });
-      return;
-    }
-
-    resetPassword(tokenId, { password, confirmPassword })
-      .then(data => {
-        toast({ description: data.message });
-      })
-      .catch(error => {
-        toast({ variant: 'destructive', description: error.message });
-      });
+  const sendEmail = (email: string) => {
+    setLoading(true);
+    sendPasswordResetEmail(email)
+      .then(data => toast({ description: data.message }))
+      .catch(error =>
+        toast({ variant: 'destructive', description: error.message })
+      )
+      .finally(() => setLoading(false));
   };
 
   return tokenId ? (
-    <WithToken
-      password={password}
-      confirmPassword={confirmPassword}
-      setPassword={setPassword}
-      setConfirmPassword={setConfirmPassword}
-      onSubmit={onSubmitPasswordReset}
-    />
+    <WithToken passwordReset={passwordReset} loading={loading} />
   ) : (
-    <WithoutToken
-      email={email}
-      setEmail={setEmail}
-      onSubmit={onSubmit}
-      sendingEmail={sendingEmail}
-    />
+    <WithoutToken sendEmail={sendEmail} loading={loading} />
   );
 }
 
-function WithToken({
-  password,
-  confirmPassword,
-  setPassword,
-  setConfirmPassword,
-  onSubmit,
-}: any) {
+function WithToken({ passwordReset, loading }: any) {
+  const formFields = [
+    {
+      name: 'password' as const,
+      label: 'New Password',
+      inputType: 'password',
+      inputPlaceholder: 'Enter your new password',
+    },
+    {
+      name: 'confirmPassword' as const,
+      label: 'Confirm Password',
+      inputType: 'password',
+      inputPlaceholder: 'Confirm your new password',
+    },
+  ];
+
+  const form = useForm<z.infer<typeof newPasswordResetSchema>>({
+    resolver: zodResolver(newPasswordResetSchema),
+    defaultValues: { password: '', confirmPassword: '' },
+  });
+
+  const onSubmit = (values: z.infer<typeof newPasswordResetSchema>) => {
+    passwordReset(values);
+  };
+
   return (
     <div className="mt-4 mx-auto p-2 md:w-1/2 text-center font-thin">
-      <Label className="mt-16 block text-left">New password</Label>
-      <Input
-        className="mt-2"
-        value={password}
-        type="password"
-        placeholder="Enter your new password"
-        onChange={e => setPassword(e.target.value)}
-      />
-      <Label className="mt-8 block text-left">Confirm new password</Label>
-      <Input
-        className="mt-2"
-        value={confirmPassword}
-        type="password"
-        placeholder="Confirm your new password"
-        onChange={e => setConfirmPassword(e.target.value)}
-      />
-      <Button className="mt-4" onClick={onSubmit}>
-        Submit
-      </Button>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          {formFields.map((formField, index) => (
+            <FormField
+              key={`passwordResetFormField_${index}`}
+              control={form.control}
+              name={formField.name}
+              render={({ field }) => (
+                <FormItem className="mt-4 w-full">
+                  <FormLabel className="mt-8 block text-left">
+                    {formField.label}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      className="mt-4 mx-auto p-0 border-0"
+                      type="password"
+                      autoComplete="on"
+                      placeholder={formField.inputPlaceholder}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-left" />
+                  <Separator className="mx-auto" />
+                </FormItem>
+              )}
+            />
+          ))}
+          <div className="mt-4 text-center">
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Resetting' : 'Reset'}
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }
 
-function WithoutToken({ email, setEmail, onSubmit, sendingEmail }: any) {
+function WithoutToken({ sendEmail, loading }: any) {
+  const form = useForm<z.infer<typeof passwordResetSchema>>({
+    resolver: zodResolver(passwordResetSchema),
+    defaultValues: { email: '' },
+  });
+
+  const onSubmit = (values: z.infer<typeof passwordResetSchema>) => {
+    sendEmail(values.email);
+  };
+
   return (
     <>
       <p className="mt-4 text-center font-thin">
@@ -141,16 +154,37 @@ function WithoutToken({ email, setEmail, onSubmit, sendingEmail }: any) {
       <div className="mt-16">
         <p>Did not receive the email?</p>
         <p>Enter your email and we will send it again.</p>
-        <Input
-          className="mt-4 mx-auto p-2 md:w-1/2 text-center border-0"
-          value={email}
-          placeholder="Enter your email"
-          onChange={e => setEmail(e.target.value)}
-        />
-        <Separator className="mx-auto md:w-1/2" />
-        <Button className="mt-4" onClick={onSubmit} disabled={sendingEmail}>
-          {sendingEmail ? 'Sending email' : 'Submit'}
-        </Button>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col items-center"
+          >
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormControl>
+                    <Input
+                      className="mt-4 mx-auto md:w-1/2 text-center border-0"
+                      type="email"
+                      autoComplete="on"
+                      placeholder="Enter your email"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <Separator className="mx-auto md:w-1/2" />
+                </FormItem>
+              )}
+            />
+            <div className="mt-4 text-center">
+              <Button type="submit" disabled={loading}>
+                {loading ? 'Sending email' : 'Submit'}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </div>
     </>
   );
