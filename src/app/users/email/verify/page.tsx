@@ -144,7 +144,7 @@ function EmailForm({ sendingEmail, sendEmail }: any) {
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem className="mt-4 w-full">
+            <FormItem className="w-full">
               <FormControl>
                 <Input
                   className="mt-4 mx-auto md:w-1/2 text-center border-0"
@@ -159,8 +159,8 @@ function EmailForm({ sendingEmail, sendEmail }: any) {
             </FormItem>
           )}
         />
-        <div className="mt-16 text-center">
-          <Button type="submit" className="mt-4" disabled={sendingEmail}>
+        <div className="mt-4 text-center">
+          <Button type="submit" disabled={sendingEmail}>
             {sendingEmail ? 'Sending email' : 'Submit'}
           </Button>
         </div>
