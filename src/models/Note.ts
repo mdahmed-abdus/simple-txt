@@ -16,6 +16,11 @@ export const noteSchema = new mongoose.Schema(
       minlength: 3,
       maxlength: 1_000,
     },
+    locked: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
   { timestamps: true }
 );
