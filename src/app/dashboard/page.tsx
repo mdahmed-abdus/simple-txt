@@ -61,7 +61,7 @@ export default function Dashboard() {
             <TableHead>Body</TableHead>
             <TableHead className="text-right">
               <Button
-                className="p-0 font-thin"
+                className="p-0 font-thin whitespace-nowrap"
                 variant="link"
                 onClick={() => router.push('notes/new')}
               >
