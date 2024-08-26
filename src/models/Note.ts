@@ -14,12 +14,14 @@ export const noteSchema = new mongoose.Schema(
       trim: true,
       required: true,
       minlength: 3,
-      maxlength: 1_000,
     },
     locked: {
       type: Boolean,
       required: true,
       default: false,
+    },
+    iv: {
+      type: Buffer,
     },
   },
   { timestamps: true }
