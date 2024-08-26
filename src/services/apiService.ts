@@ -68,5 +68,5 @@ export const resetPassword = (
     http.post(`/users/password/reset?tokenId=${tokenId}`, resetPasswordData)
   );
 
-export const getEncAndDec = (data: string) =>
-  apiHandler(() => http.post('/crypto/both', { data }));
+export const getEncAndDec = (data: string, password: string) =>
+  apiHandler(() => http.post('/crypto/both', { data, password }));

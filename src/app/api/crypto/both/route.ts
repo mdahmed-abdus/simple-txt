@@ -6,10 +6,32 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
     const reqBody = await request.json();
-    const { data } = reqBody;
+    const { data, password } = reqBody;
 
-    const enc = encrypt(data);
-    const dec = decrypt(enc);
+    const {
+      success: encSuccess,
+      message: encMessage,
+      encrypted: enc,
+      iv,
+    } = encrypt(data, password);
+    if (!encSuccess) {
+      return NextResponse.json(
+        { success: false, message: encMessage },
+        { status: 400 }
+      );
+    }
+
+    const {
+      success: decSuccess,
+      message: decMessage,
+      decrypted: dec,
+    } = decrypt(enc!, password, iv!);
+    if (!decSuccess) {
+      return NextResponse.json(
+        { success: false, message: decMessage },
+        { status: 400 }
+      );
+    }
 
     return NextResponse.json({ success: true, enc, dec }, { status: 200 });
   } catch (error: any) {
