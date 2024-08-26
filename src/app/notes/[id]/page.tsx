@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
@@ -38,13 +38,25 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 
+type Note = {
+  _id: string;
+  title: string;
+  body: string;
+  locked: boolean;
+};
+
 export default function NoteById({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { toast } = useToast();
 
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
-  const [note, setNote] = useState({ _id: '', title: '', body: '' });
+  const [note, setNote] = useState<Note>({
+    _id: '',
+    title: '',
+    body: '',
+    locked: false,
+  });
 
   const enterEditMode = () => setEditMode(true);
   const exitEditMode = () => setEditMode(false);
@@ -137,7 +149,13 @@ function EditNoteForm({
   setLoading,
   exitEditMode,
   updateNote,
-}: any) {
+}: {
+  note: Note;
+  loading: boolean;
+  setLoading: Dispatch<SetStateAction<boolean>>;
+  exitEditMode: () => void;
+  updateNote: (values: { title: string; body: string }) => void;
+}) {
   const formFields = [
     {
       name: 'title' as const,
@@ -225,7 +243,7 @@ function ShowNote({
   deleteNote,
   enterEditMode,
 }: {
-  note: { _id: string; title: string; body: string };
+  note: Note;
   deleteNote: () => void;
   enterEditMode: () => void;
 }) {
