@@ -76,3 +76,6 @@ export const lockNote = (id: string, notePassword: string) =>
 
 export const unlockNote = (id: string, notePassword: string) =>
   apiHandler(() => http.post(`/notes/${id}/unlock`, { notePassword }));
+
+export const viewLockedNote = (id: string, notePassword: string) =>
+  apiHandler(() => http.post(`/notes/${id}/view-locked`, { notePassword }));
