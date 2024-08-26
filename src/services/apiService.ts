@@ -70,3 +70,9 @@ export const resetPassword = (
 
 export const getEncAndDec = (data: string, password: string) =>
   apiHandler(() => http.post('/crypto/both', { data, password }));
+
+export const lockNote = (id: string, notePassword: string) =>
+  apiHandler(() => http.post(`/notes/${id}/lock`, { notePassword }));
+
+export const unlockNote = (id: string, notePassword: string) =>
+  apiHandler(() => http.post(`/notes/${id}/unlock`, { notePassword }));

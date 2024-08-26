@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { User } from '@/models/User';
 import { isLoggedIn } from '@/app/api/helpers/auth';
 import { validateId } from '@/app/api/helpers/validateId';
-import { decrypt } from '@/services/cipher';
+import { User } from '@/models/User';
+import { encrypt } from '@/services/cipher';
+import { NextRequest, NextResponse } from 'next/server';
 
-// GET /api/notes/[id]/unlock
-// unlocks and decrypts note with given id
+// POST /notes/[id]/lock
+// locks and encrypts note with given id
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -36,9 +36,9 @@ export async function POST(
       );
     }
 
-    if (!note.locked) {
+    if (note.locked) {
       return NextResponse.json(
-        { success: false, message: 'Note already unlocked' },
+        { success: false, message: 'Note already locked' },
         { status: 400 }
       );
     }
@@ -46,10 +46,9 @@ export async function POST(
     const reqBody = await request.json();
     const { notePassword } = reqBody;
 
-    const { success, message, decrypted } = decrypt(
+    const { success, message, encrypted, iv } = encrypt(
       note.body,
-      notePassword,
-      note.iv
+      notePassword
     );
 
     if (!success) {
@@ -59,13 +58,13 @@ export async function POST(
       );
     }
 
-    note.body = decrypted;
-    note.locked = false;
-    note.iv = null;
+    note.body = encrypted;
+    note.locked = true;
+    note.iv = iv;
     await user.save();
 
     return NextResponse.json(
-      { success: true, message: 'Note unlocked' },
+      { success: true, message: 'Note locked' },
       { status: 200 }
     );
   } catch (error: any) {
