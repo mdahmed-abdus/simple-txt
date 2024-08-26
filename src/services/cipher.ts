@@ -1,29 +1,69 @@
+// the key length is dependent on the algorithm
+// in case for aes192, it is 24 bytes (192 bits)
+// https://nodejs.org/api/crypto.html
+// https://nodejs.org/api/crypto.html#class-cipher
+//
+// consider using String.prototype.normalize() on user inputs before passing them to cryptographic APIs
+// https://nodejs.org/api/crypto.html#using-strings-as-inputs-to-cryptographic-apis
+
 import {
   scryptSync,
   createCipheriv,
   createDecipheriv,
-  randomFillSync,
+  randomBytes,
 } from 'node:crypto';
 
-const algorithm = 'aes-192-cbc';
-const password = 'Password used to generate key';
-const key = scryptSync(password, 'salt', 24);
-const iv = randomFillSync(new Uint8Array(16));
+const ALGORITHM = 'aes-192-cbc';
+const SALT_SIZE = 16;
+const KEY_LENGTH = 24;
 
-export function encrypt(data: string): string {
-  const cipher = createCipheriv(algorithm, key, iv);
+export function encrypt(
+  data: string,
+  password: string
+): { success: boolean; encrypted?: string; iv?: Buffer; message?: string } {
+  password = password.normalize('NFC');
 
-  let encrypted = cipher.update(data, 'utf8', 'hex');
-  encrypted += cipher.final('hex');
+  const salt = randomBytes(SALT_SIZE).toString('hex');
+  const key = scryptSync(password, salt, KEY_LENGTH);
+  const iv = randomBytes(16);
 
-  return encrypted;
+  const cipher = createCipheriv(ALGORITHM, key, iv);
+
+  try {
+    let encrypted = cipher.update(data, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    encrypted = salt + '$' + encrypted;
+    return { success: true, encrypted, iv };
+  } catch (err) {
+    console.log(err);
+    return { success: false, message: 'Could not encrypt' };
+  }
 }
 
-export function decrypt(data: string): string {
-  const decipher = createDecipheriv(algorithm, key, iv);
+export function decrypt(
+  data: string,
+  password: string,
+  iv: Buffer
+): { success: boolean; decrypted?: string; message?: string } {
+  password = password.normalize('NFC');
 
-  let decrypted = decipher.update(data, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
+  const x = data.split('$');
+  const salt = x[0];
+  data = x[1];
 
-  return decrypted;
+  const key = scryptSync(password, salt, KEY_LENGTH);
+
+  const decipher = createDecipheriv(ALGORITHM, key, iv);
+
+  try {
+    let decrypted = decipher.update(data, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    return { success: true, decrypted };
+  } catch (err) {
+    console.log(err);
+    return {
+      success: false,
+      message: 'Could not decrypt - invalid password possible',
+    };
+  }
 }
