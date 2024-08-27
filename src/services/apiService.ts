@@ -37,8 +37,13 @@ export const logoutUser = () => apiHandler(() => http.post('/users/logout'));
 
 export const getAllNotes = () => apiHandler(() => http.get('/notes'));
 
-export const addNewNote = (noteData: { title: string; body: string }) =>
-  apiHandler(() => http.post('/notes', noteData));
+export const addNewNote = (noteData: {
+  title: string;
+  body: string;
+  locked: boolean;
+  notePassword?: string;
+  confirmNotePassword?: string;
+}) => apiHandler(() => http.post('/notes', noteData));
 
 export const getNoteById = (id: string) =>
   apiHandler(() => http.get(`/notes/${id}`));

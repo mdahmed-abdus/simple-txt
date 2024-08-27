@@ -48,9 +48,15 @@ export async function POST(request: NextRequest) {
     }
 
     const reqBody = await request.json();
-    const { title, body } = reqBody;
+    const { title, body, locked, notePassword, confirmNotePassword } = reqBody;
 
-    const { success, errorMessage } = validate(noteSchema, { title, body });
+    const { success, errorMessage } = validate(noteSchema, {
+      title,
+      body,
+      locked,
+      notePassword,
+      confirmNotePassword,
+    });
 
     if (!success) {
       return NextResponse.json({ message: errorMessage }, { status: 400 });
