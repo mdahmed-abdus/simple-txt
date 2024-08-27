@@ -20,33 +20,28 @@ import { useForm } from 'react-hook-form';
 import { noteSchema } from '@/validation/validationSchemas';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function NewNote() {
   const [saving, setSaving] = useState(false);
+  const [lockNote, setLockNote] = useState(false);
+
   const router = useRouter();
   const { toast } = useToast();
 
-  const formFields = [
-    {
-      name: 'title' as const,
-      label: 'Title',
-      inputType: 'text',
-      inputPlaceholder: 'Enter note title',
-    },
-    {
-      name: 'body' as const,
-      label: 'Body',
-      inputType: 'text',
-      inputPlaceholder: 'Enter note body',
-    },
-  ];
-
   const form = useForm<z.infer<typeof noteSchema>>({
     resolver: zodResolver(noteSchema),
-    defaultValues: { title: '', body: '' },
+    defaultValues: {
+      title: '',
+      body: '',
+      locked: false,
+      notePassword: '',
+      confirmNotePassword: '',
+    },
   });
 
   const onSubmit = (values: z.infer<typeof noteSchema>) => {
+    console.log(values);
     setSaving(true);
 
     addNewNote(values)
@@ -71,37 +66,119 @@ export default function NewNote() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col items-center"
           >
-            {formFields.map((formField, index) => (
-              <FormField
-                key={`newNoteFormField_${index}`}
-                control={form.control}
-                name={formField.name}
-                render={({ field }) => (
-                  <FormItem className="mt-4 w-full">
-                    <FormLabel>{formField.label}</FormLabel>
-                    <FormControl>
-                      {formField.name === 'body' ? (
-                        <Textarea
-                          className="border-0 p-0 min-h-fit"
-                          placeholder={formField.inputPlaceholder}
-                          {...field}
-                        />
-                      ) : (
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem className="mt-4 w-full">
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="border-0 p-0"
+                      type="text"
+                      placeholder="Enter title"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <Separator />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="body"
+              render={({ field }) => (
+                <FormItem className="mt-4 w-full">
+                  <FormLabel>Body</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      className="border-0 p-0 min-h-fit"
+                      placeholder="Enter body"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <Separator />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="locked"
+              render={({ field }) => (
+                <FormItem className="mt-4 flex items-center space-x-2 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      onClick={() => setLockNote(!lockNote)}
+                    />
+                  </FormControl>
+                  <FormLabel className="text-sm font-normal">
+                    Lock this note
+                  </FormLabel>
+                </FormItem>
+              )}
+            />
+            {lockNote && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="notePassword"
+                  render={({ field }) => (
+                    <FormItem className="mt-4 w-full">
+                      <FormLabel>Note Password</FormLabel>
+                      <FormControl>
                         <Input
                           className="border-0 p-0"
-                          type={formField.inputType}
-                          autoComplete="on"
-                          placeholder={formField.inputPlaceholder}
+                          type="password"
+                          placeholder="Enter note password"
                           {...field}
                         />
-                      )}
-                    </FormControl>
-                    <FormMessage />
-                    <Separator />
-                  </FormItem>
-                )}
-              />
-            ))}
+                      </FormControl>
+                      <FormMessage />
+                      <Separator />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="confirmNotePassword"
+                  render={({ field }) => (
+                    <FormItem className="mt-4 w-full">
+                      <FormLabel>Confirm note password</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="border-0 p-0"
+                          type="password"
+                          placeholder="Confirm note password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      <Separator />
+                    </FormItem>
+                  )}
+                />
+                <ul className="mt-16 text-sm">
+                  <li>
+                    Please remember the password and keep it somewhere safe.
+                  </li>
+                  <li>
+                    To change password - unlock the note, and lock it again with
+                    new password.
+                  </li>
+                  <li className="text-destructive">
+                    Password cannot be reset.
+                  </li>
+                  <li className="text-destructive">
+                    Without password, note cannot be decrypted and data cannot
+                    be recovered.
+                  </li>
+                </ul>
+              </>
+            )}
             <div className="mt-16 text-center">
               <Button
                 className="font-normal"
@@ -110,7 +187,7 @@ export default function NewNote() {
               >
                 Cancel
               </Button>
-              <Button type="submit" className="mt-16 w-fit" disabled={saving}>
+              <Button type="submit" className="w-fit" disabled={saving}>
                 {saving ? 'Saving...' : 'Save'}
               </Button>
             </div>
