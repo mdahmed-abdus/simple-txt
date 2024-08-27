@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { noteSchema } from '@/validation/validationSchemas';
+import { updateNoteSchema } from '@/validation/validationSchemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form,
@@ -47,12 +47,12 @@ export default function EditNoteForm({
     },
   ];
 
-  const form = useForm<z.infer<typeof noteSchema>>({
-    resolver: zodResolver(noteSchema),
+  const form = useForm<z.infer<typeof updateNoteSchema>>({
+    resolver: zodResolver(updateNoteSchema),
     defaultValues: { title: note.title, body: note.body },
   });
 
-  const onSubmit = (values: z.infer<typeof noteSchema>) => {
+  const onSubmit = (values: z.infer<typeof updateNoteSchema>) => {
     setLoading(true);
     updateNote(values);
   };

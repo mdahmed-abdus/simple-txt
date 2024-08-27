@@ -26,6 +26,8 @@ export default function NoteById({ params }: { params: { id: string } }) {
     body: '',
     locked: false,
   });
+  const [currentLock, setCurrentLock] = useState(true);
+  const [notePassword, setNotePassword] = useState('');
 
   const enterEditMode = () => setEditMode(true);
   const exitEditMode = () => setEditMode(false);
@@ -35,6 +37,7 @@ export default function NoteById({ params }: { params: { id: string } }) {
     getNoteById(params.id)
       .then(data => {
         setNote(data.note);
+        setCurrentLock(data.note.locked);
         setLoading(false);
       })
       .catch(error => {
@@ -50,7 +53,7 @@ export default function NoteById({ params }: { params: { id: string } }) {
   );
 
   const deleteNote = () => {
-    deleteNoteById(note._id)
+    deleteNoteById(note._id, notePassword)
       .then(data => {
         toast({ description: data.message });
         router.push('/dashboard');
@@ -64,6 +67,7 @@ export default function NoteById({ params }: { params: { id: string } }) {
     updateNoteById(note._id, {
       title: values.title,
       body: values.body,
+      notePassword,
     })
       .then(data => {
         toast({ description: data.message });
@@ -95,8 +99,13 @@ export default function NoteById({ params }: { params: { id: string } }) {
           ) : (
             <DisplayNote
               note={note}
+              setNote={setNote}
+              currentLock={currentLock}
+              setCurrentLock={setCurrentLock}
               deleteNote={deleteNote}
               enterEditMode={enterEditMode}
+              notePassword={notePassword}
+              setNotePassword={setNotePassword}
             />
           )}
         </div>
