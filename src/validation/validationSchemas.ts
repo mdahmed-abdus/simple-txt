@@ -23,43 +23,40 @@ const password = z
   .min(8, { message: 'Password must be at least 8 characters' })
   .max(72, { message: 'Password must be at most 72 characters' });
 
+const title = z
+  .string()
+  .trim()
+  .min(3, { message: 'Title must be at least 3 characters' })
+  .max(60, { message: 'Title must be at most 60 characters' });
+
+const body = z
+  .string()
+  .trim()
+  .min(3, { message: 'Body must be at least 3 characters' })
+  .max(1_000, { message: 'Body must be at most 1,000 characters' });
+
+const locked = z.boolean();
+
+const notePassword = z.preprocess(
+  arg => (typeof arg === 'string' && arg === '' ? undefined : arg),
+  z
+    .string()
+    .min(4, {
+      message: 'Password must be at least 4 characters',
+    })
+    .max(20, {
+      message: 'Password must be at most 20 characters',
+    })
+    .optional()
+);
+
 export const noteSchema = z
   .object({
-    title: z
-      .string()
-      .trim()
-      .min(3, { message: 'Title must be at least 3 characters' })
-      .max(60, { message: 'Title must be at most 60 characters' }),
-    body: z
-      .string()
-      .trim()
-      .min(3, { message: 'Body must be at least 3 characters' })
-      .max(1_000, { message: 'Body must be at most 1,000 characters' }),
-    locked: z.boolean(),
-    notePassword: z.preprocess(
-      arg => (typeof arg === 'string' && arg === '' ? undefined : arg),
-      z
-        .string()
-        .min(4, {
-          message: 'Note password must be at least 4 characters',
-        })
-        .max(20, {
-          message: 'Note password must be at most 20 characters',
-        })
-        .optional()
-    ),
-    confirmNotePassword: z.preprocess(
-      arg => (typeof arg === 'string' && arg === '' ? undefined : arg),
-      z
-        .string()
-        .min(4, {
-          message: 'Confirm note password must be at least 4 characters',
-        })
-        .max(20, {
-          message: 'Confirm note password must be at most 20 characters',
-        })
-        .optional()
-    ),
+    title,
+    body,
+    locked,
+    notePassword,
+    confirmNotePassword: notePassword,
   })
   .required()
   .refine(data => !data.locked || (data.locked && data.notePassword), {
@@ -70,6 +67,10 @@ export const noteSchema = z
     message: 'Passwords do not match',
     path: ['confirmNotePassword'],
   });
+
+export const updateNoteSchema = z.object({ title, body }).required();
+
+export const notePasswordSchema = z.object({ notePassword }).required();
 
 export const userRegisterSchema = z
   .object({ name, email, password, confirmPassword: password })
