@@ -37,7 +37,12 @@ const body = z
 
 const locked = z.boolean();
 
-const notePassword = z.preprocess(
+const notePassword = z
+  .string({ required_error: 'notePassword required' })
+  .min(4, { message: 'Password must be at least 4 characters' })
+  .max(20, { message: 'Password must be at most 20 characters' });
+
+const notePasswordOptional = z.preprocess(
   arg => (typeof arg === 'string' && arg === '' ? undefined : arg),
   z
     .string()
@@ -55,8 +60,8 @@ export const noteSchema = z
     title,
     body,
     locked,
-    notePassword,
-    confirmNotePassword: notePassword,
+    notePassword: notePasswordOptional,
+    confirmNotePassword: notePasswordOptional,
   })
   .required()
   .refine(data => !data.locked || (data.locked && data.notePassword), {
