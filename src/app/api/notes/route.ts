@@ -14,7 +14,7 @@ connectDb();
 // get all notes
 export async function GET(request: NextRequest) {
   try {
-    // check is user is logged in
+    // check if user is logged in
     // accessible only for authenticated users
     const userId = isLoggedIn(request);
     if (!userId) {
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
 // add new note
 export async function POST(request: NextRequest) {
   try {
-    // check is user is logged in
+    // check if user is logged in
     // accessible only for authenticated users
     const userId = isLoggedIn(request);
     if (!userId) {

@@ -11,7 +11,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // check is user is logged in
+    // check if user is logged in
     // accessible only for authenticated users
     const userId = isLoggedIn(request);
     if (!userId) {
