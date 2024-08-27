@@ -2,9 +2,14 @@ import { User } from '@/models/User';
 import { connectDb } from '@/services/db';
 import { NextRequest, NextResponse } from 'next/server';
 import { isLoggedIn } from '../../helpers/auth';
-import { noteSchema } from '@/validation/validationSchemas';
+import {
+  notePasswordSchema,
+  updateNoteSchema,
+} from '@/validation/validationSchemas';
 import { validate } from '@/validation/validator';
 import { validateId } from '../../helpers/validateId';
+import { filterPublicNote } from '../../helpers/note';
+import { decrypt, encrypt } from '@/services/cipher';
 
 connectDb();
 
@@ -15,6 +20,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // check is user is logged in
+    // accessible only for authenticated users
     const userId = isLoggedIn(request);
     if (!userId) {
       return NextResponse.json(
@@ -23,6 +30,7 @@ export async function GET(
       );
     }
 
+    // validate id
     if (!validateId(params.id)) {
       return NextResponse.json(
         { message: 'Note with given id was not found' },
@@ -30,10 +38,9 @@ export async function GET(
       );
     }
 
+    // get user note
     const user = await User.findById(userId);
-    const note = user.notes.find(
-      (n: any, i: number) => n._id.toString() === params.id
-    );
+    const note = user.notes.find((n: any) => n._id.toString() === params.id);
 
     if (!note) {
       return NextResponse.json(
@@ -43,7 +50,7 @@ export async function GET(
     }
 
     return NextResponse.json(
-      { success: true, message: 'Note found', note },
+      { success: true, message: 'Note found', note: filterPublicNote(note) },
       { status: 200 }
     );
   } catch (error: any) {
@@ -62,6 +69,8 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
+    // check is user is logged in
+    // accessible only for authenticated users
     const userId = isLoggedIn(request);
     if (!userId) {
       return NextResponse.json(
@@ -70,6 +79,7 @@ export async function PUT(
       );
     }
 
+    // validate id
     if (!validateId(params.id)) {
       return NextResponse.json(
         { message: 'Note with given id was not found' },
@@ -77,10 +87,9 @@ export async function PUT(
       );
     }
 
+    // get user and note
     const user = await User.findById(userId);
-    const note = user.notes.find(
-      (n: any, i: number) => n._id.toString() === params.id
-    );
+    const note = user.notes.find((n: any) => n._id.toString() === params.id);
 
     if (!note) {
       return NextResponse.json(
@@ -89,27 +98,99 @@ export async function PUT(
       );
     }
 
+    // note data from user
     const reqBody = await request.json();
 
     // if updated title not provided then use the old title
-    // if updated body not provided then use the old body
-    const { title = note.title, body = note.body } = reqBody;
+    let { title = note.title, body, notePassword } = reqBody;
 
-    const { success, errorMessage } = validate(noteSchema, {
-      title,
-      body,
+    // validate note password
+    const {
+      success: isNotePasswordValid,
+      errorMessage: invalidNotePasswordMessage,
+    } = validate(notePasswordSchema, {
+      notePassword,
     });
-
-    if (!success) {
-      return NextResponse.json({ message: errorMessage }, { status: 400 });
+    if (!isNotePasswordValid) {
+      return NextResponse.json(
+        { success: false, message: invalidNotePasswordMessage },
+        { status: 400 }
+      );
     }
 
-    note.title = title;
-    note.body = body;
+    let noteBodyUpdated = true;
+
+    // if updated body not provided then use the old body
+    // if note is locked we need to decrypt the old note body before using it
+    if (note.locked) {
+      // correct password -> decryption successful -> proceed with note update
+      // invalid password -> decryption not successful -> cancel note update
+      const { success: decryptSuccessful, decrypted } = decrypt(
+        note.body,
+        notePassword,
+        note.iv
+      );
+
+      if (!decryptSuccessful) {
+        return NextResponse.json(
+          { success: false, message: 'Invalid note password' },
+          { status: 400 }
+        );
+      }
+
+      if (!body) {
+        noteBodyUpdated = false;
+        body = decrypted; // use old decrypted note body
+      }
+    } else {
+      // note unlocked -> we can use old note body directly
+      if (!body) {
+        noteBodyUpdated = false;
+        body = note.body; // use old note body
+      }
+    }
+
+    // validate note title and body
+    const { success: isNoteDataValid, errorMessage: invalidNoteDataMessage } =
+      validate(updateNoteSchema, {
+        title,
+        body,
+      });
+    if (!isNoteDataValid) {
+      return NextResponse.json(
+        { success: false, message: invalidNoteDataMessage },
+        { status: 400 }
+      );
+    }
+
+    // updating note
+    if (noteBodyUpdated) {
+      // note body needs to be updated only if updated body is provided
+      if (note.locked) {
+        // noteBodyUpdated && note.locked -> update note body -> encrypt again = yes
+        const { success, message, encrypted, iv } = encrypt(body, notePassword);
+        if (!success) {
+          return NextResponse.json(
+            { success: false, message: message },
+            { status: 400 }
+          );
+        }
+        note.body = encrypted; // update note body
+        note.iv = iv; // update note iv
+      } else {
+        // noteBodyUpdated && !note.locked -> update note body -> encrypt again = no
+        note.body = body;
+      }
+    }
+    // no changes to note body if updated body is not provided
+    // !noteBodyUpdated && note.locked -> no action -> encrypt again = no
+    // !noteBodyUpdated && !note.locked -> no action -> encrypt again = no
+
+    note.title = title; // update note title
     await user.save();
 
     return NextResponse.json(
-      { success: true, message: 'Note updated', note },
+      { success: true, message: 'Note updated', note: filterPublicNote(note) },
       { status: 200 }
     );
   } catch (error: any) {
@@ -128,6 +209,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    // check is user is logged in
+    // accessible only for authenticated users
     const userId = isLoggedIn(request);
     if (!userId) {
       return NextResponse.json(
@@ -136,6 +219,7 @@ export async function DELETE(
       );
     }
 
+    // validate id
     if (!validateId(params.id)) {
       return NextResponse.json(
         { message: 'Note with given id was not found' },
@@ -143,10 +227,9 @@ export async function DELETE(
       );
     }
 
+    // get user and note
     const user = await User.findById(userId);
-    const note = user.notes.find(
-      (n: any, i: number) => n._id.toString() === params.id
-    );
+    const note = user.notes.find((n: any) => n._id.toString() === params.id);
 
     if (!note) {
       return NextResponse.json(
@@ -155,11 +238,26 @@ export async function DELETE(
       );
     }
 
+    // get notePassword from user
+    const reqBody = await request.json();
+    const { notePassword } = reqBody;
+
+    // validate note password
+    const { success, errorMessage } = validate(notePasswordSchema, {
+      notePassword,
+    });
+    if (!success) {
+      return NextResponse.json(
+        { success: false, message: errorMessage },
+        { status: 400 }
+      );
+    }
+
     await note.deleteOne();
     await user.save();
 
     return NextResponse.json(
-      { success: true, message: 'Note deleted', note },
+      { success: true, message: 'Note deleted', note: filterPublicNote(note) },
       { status: 200 }
     );
   } catch (error: any) {

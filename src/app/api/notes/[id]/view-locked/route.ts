@@ -11,6 +11,8 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // check is user is logged in
+    // accessible only for authenticated users
     const userId = isLoggedIn(request);
     if (!userId) {
       return NextResponse.json(
@@ -19,6 +21,7 @@ export async function GET(
       );
     }
 
+    // validate id
     if (!validateId(params.id)) {
       return NextResponse.json(
         { message: 'Note with given id was not found' },
@@ -26,6 +29,7 @@ export async function GET(
       );
     }
 
+    // get user and note
     const user = await User.findById(userId);
     const note = user.notes.find((n: any) => n._id.toString() === params.id);
 
@@ -36,22 +40,22 @@ export async function GET(
       );
     }
 
+    // not found if note is unlocked
     if (!note.locked) {
       return NextResponse.json(
         { success: false, message: 'Note with given id was not found' },
         { status: 404 }
       );
     }
+
+    // get notePassword from user
     const reqBody = await request.json();
     const { notePassword } = reqBody;
 
-    const { success, message, decrypted } = decrypt(
-      note.body,
-      notePassword,
-      note.iv
-    );
-
+    // decrypt note
+    const { success, decrypted } = decrypt(note.body, notePassword, note.iv);
     if (!success) {
+      // unsuccessful decryption -> invalid password
       return NextResponse.json(
         { success: false, message: 'Invalid note password' },
         { status: 400 }
