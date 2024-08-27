@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // POST /api/notes/[id]/view-locked
 // view locked note by id
-export async function GET(
+export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {

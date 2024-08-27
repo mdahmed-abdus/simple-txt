@@ -104,25 +104,25 @@ export async function PUT(
     // if updated title not provided then use the old title
     let { title = note.title, body, notePassword } = reqBody;
 
-    // validate note password
-    const {
-      success: isNotePasswordValid,
-      errorMessage: invalidNotePasswordMessage,
-    } = validate(notePasswordSchema, {
-      notePassword,
-    });
-    if (!isNotePasswordValid) {
-      return NextResponse.json(
-        { success: false, message: invalidNotePasswordMessage },
-        { status: 400 }
-      );
-    }
-
     let noteBodyUpdated = true;
 
     // if updated body not provided then use the old body
     // if note is locked we need to decrypt the old note body before using it
     if (note.locked) {
+      // validate note password
+      const {
+        success: isNotePasswordValid,
+        errorMessage: invalidNotePasswordMessage,
+      } = validate(notePasswordSchema, {
+        notePassword,
+      });
+      if (!isNotePasswordValid) {
+        return NextResponse.json(
+          { success: false, message: invalidNotePasswordMessage },
+          { status: 400 }
+        );
+      }
+
       // correct password -> decryption successful -> proceed with note update
       // invalid password -> decryption not successful -> cancel note update
       const { success: decryptSuccessful, decrypted } = decrypt(
@@ -238,21 +238,39 @@ export async function DELETE(
       );
     }
 
-    // get notePassword from user
-    const reqBody = await request.json();
-    const { notePassword } = reqBody;
+    if (note.locked) {
+      // get notePassword from user
+      const reqBody = await request.json();
+      const { notePassword } = reqBody;
 
-    // validate note password
-    const { success, errorMessage } = validate(notePasswordSchema, {
-      notePassword,
-    });
-    if (!success) {
-      return NextResponse.json(
-        { success: false, message: errorMessage },
-        { status: 400 }
+      // validate note password
+      const { success, errorMessage } = validate(notePasswordSchema, {
+        notePassword,
+      });
+      if (!success) {
+        return NextResponse.json(
+          { success: false, message: errorMessage },
+          { status: 400 }
+        );
+      }
+
+      // decrypt successful -> valid note password
+      const { success: decryptSuccessful } = decrypt(
+        note.body,
+        notePassword,
+        note.iv
       );
+
+      // decrypt unsuccessful -> invalid note password
+      if (!decryptSuccessful) {
+        return NextResponse.json(
+          { success: false, message: 'Invalid note password' },
+          { status: 400 }
+        );
+      }
     }
 
+    // delete note
     await note.deleteOne();
     await user.save();
 

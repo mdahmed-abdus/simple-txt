@@ -50,11 +50,20 @@ export const getNoteById = (id: string) =>
 
 export const updateNoteById = (
   id: string,
-  noteData: { title: string; body: string }
+  noteData: { title: string; body: string; notePassword?: string }
 ) => apiHandler(() => http.put(`/notes/${id}`, noteData));
 
-export const deleteNoteById = (id: string) =>
-  apiHandler(() => http.delete(`/notes/${id}`));
+export const deleteNoteById = (id: string, notePassword?: string) =>
+  apiHandler(() => http.delete(`/notes/${id}`, { data: { notePassword } }));
+
+export const lockNote = (id: string, notePassword: string) =>
+  apiHandler(() => http.post(`/notes/${id}/lock`, { notePassword }));
+
+export const unlockNote = (id: string, notePassword: string) =>
+  apiHandler(() => http.post(`/notes/${id}/unlock`, { notePassword }));
+
+export const viewLockedNote = (id: string, notePassword: string) =>
+  apiHandler(() => http.post(`/notes/${id}/view-locked`, { notePassword }));
 
 export const sendVerificationEmail = (email: string) =>
   apiHandler(() => http.post('/users/email/resend', { email }));
@@ -75,12 +84,3 @@ export const resetPassword = (
 
 export const getEncAndDec = (data: string, password: string) =>
   apiHandler(() => http.post('/crypto/both', { data, password }));
-
-export const lockNote = (id: string, notePassword: string) =>
-  apiHandler(() => http.post(`/notes/${id}/lock`, { notePassword }));
-
-export const unlockNote = (id: string, notePassword: string) =>
-  apiHandler(() => http.post(`/notes/${id}/unlock`, { notePassword }));
-
-export const viewLockedNote = (id: string, notePassword: string) =>
-  apiHandler(() => http.post(`/notes/${id}/view-locked`, { notePassword }));
