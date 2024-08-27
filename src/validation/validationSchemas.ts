@@ -35,8 +35,41 @@ export const noteSchema = z
       .trim()
       .min(3, { message: 'Body must be at least 3 characters' })
       .max(1_000, { message: 'Body must be at most 1,000 characters' }),
+    locked: z.boolean(),
+    notePassword: z.preprocess(
+      arg => (typeof arg === 'string' && arg === '' ? undefined : arg),
+      z
+        .string()
+        .min(4, {
+          message: 'Note password must be at least 4 characters',
+        })
+        .max(20, {
+          message: 'Note password must be at most 20 characters',
+        })
+        .optional()
+    ),
+    confirmNotePassword: z.preprocess(
+      arg => (typeof arg === 'string' && arg === '' ? undefined : arg),
+      z
+        .string()
+        .min(4, {
+          message: 'Confirm note password must be at least 4 characters',
+        })
+        .max(20, {
+          message: 'Confirm note password must be at most 20 characters',
+        })
+        .optional()
+    ),
   })
-  .required();
+  .required()
+  .refine(data => !data.locked || (data.locked && data.notePassword), {
+    message: 'Enter password',
+    path: ['notePassword'],
+  })
+  .refine(data => data.notePassword === data.confirmNotePassword, {
+    message: 'Passwords do not match',
+    path: ['confirmNotePassword'],
+  });
 
 export const userRegisterSchema = z
   .object({ name, email, password, confirmPassword: password })
