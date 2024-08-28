@@ -20,24 +20,23 @@ export default function NoteById({ params }: { params: { id: string } }) {
 
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
+  const [notePassword, setNotePassword] = useState('');
   const [note, setNote] = useState<Note>({
     _id: '',
     title: '',
     body: '',
     locked: false,
   });
-  const [currentLock, setCurrentLock] = useState(true);
-  const [notePassword, setNotePassword] = useState('');
 
   const enterEditMode = () => setEditMode(true);
   const exitEditMode = () => setEditMode(false);
 
   const loadNote = () => {
     setLoading(true);
+
     getNoteById(params.id)
       .then(data => {
         setNote(data.note);
-        setCurrentLock(data.note.locked);
         setLoading(false);
       })
       .catch(error => {
@@ -45,12 +44,6 @@ export default function NoteById({ params }: { params: { id: string } }) {
         router.push('/dashboard');
       });
   };
-
-  useEffect(
-    () => loadNote(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
 
   const deleteNote = () => {
     deleteNoteById(note._id, notePassword)
@@ -64,11 +57,9 @@ export default function NoteById({ params }: { params: { id: string } }) {
   };
 
   const updateNote = (values: { title: string; body: string }) => {
-    updateNoteById(note._id, {
-      title: values.title,
-      body: values.body,
-      notePassword,
-    })
+    setLoading(true);
+
+    updateNoteById(note._id, { ...values, notePassword })
       .then(data => {
         toast({ description: data.message });
         loadNote();
@@ -76,8 +67,15 @@ export default function NoteById({ params }: { params: { id: string } }) {
       })
       .catch(error =>
         toast({ variant: 'destructive', description: error.message })
-      );
+      )
+      .finally(() => setLoading(false));
   };
+
+  useEffect(
+    () => loadNote(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   return (
     <div className="mt-16 md:mt-32">
@@ -91,8 +89,6 @@ export default function NoteById({ params }: { params: { id: string } }) {
           {editMode ? (
             <EditNoteForm
               note={note}
-              loading={loading}
-              setLoading={setLoading}
               updateNote={updateNote}
               exitEditMode={exitEditMode}
             />
@@ -100,8 +96,6 @@ export default function NoteById({ params }: { params: { id: string } }) {
             <DisplayNote
               note={note}
               setNote={setNote}
-              currentLock={currentLock}
-              setCurrentLock={setCurrentLock}
               deleteNote={deleteNote}
               enterEditMode={enterEditMode}
               notePassword={notePassword}
