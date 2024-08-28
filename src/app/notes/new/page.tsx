@@ -41,7 +41,6 @@ export default function NewNote() {
   });
 
   const onSubmit = (values: z.infer<typeof noteSchema>) => {
-    console.log(values);
     setSaving(true);
 
     addNewNote(values)

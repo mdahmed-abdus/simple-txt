@@ -35,7 +35,6 @@ export function encrypt(
     encrypted = salt + '$' + encrypted;
     return { success: true, encrypted, iv };
   } catch (err) {
-    console.log(err);
     return { success: false, message: 'Could not encrypt' };
   }
 }
@@ -60,7 +59,6 @@ export function decrypt(
     decrypted += decipher.final('utf8');
     return { success: true, decrypted };
   } catch (err) {
-    console.log(err);
     return {
       success: false,
       message: 'Could not decrypt - invalid password possible',

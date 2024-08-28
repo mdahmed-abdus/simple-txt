@@ -45,7 +45,6 @@ export default function DisplayNote({
 
     viewLockedNote(note._id, notePassword)
       .then(data => {
-        console.log(data);
         toast({ description: data.message });
         setNote({ ...note, body: data.note.decryptedBody });
         setCurrentLock(false);
