@@ -1,22 +1,30 @@
-import jwt from 'jsonwebtoken';
+import { SignJWT, jwtVerify } from 'jose';
 
-const TOKEN_SECRET_KEY = process.env.JWT_SECRET!;
-const AUTH_TOKEN_MAX_AGE = process.env.AUTH_TOKEN_MAX_AGE!;
+const SECRET = process.env.JWT_SECRET!;
+const EXP = +process.env.AUTH_TOKEN_MAX_AGE!;
 
-export function generateAuthToken(tokenData: {
+export async function signAuthToken(payload: {
   userId: string;
   email: string;
-}) {
-  return jwt.sign(tokenData, TOKEN_SECRET_KEY, {
-    expiresIn: AUTH_TOKEN_MAX_AGE,
-    // TODO: add issuer
-  });
+}): Promise<string> {
+  const iat = Math.floor(Date.now() / 1000);
+
+  return new SignJWT({ ...payload })
+    .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
+    .setExpirationTime(iat + EXP)
+    .setIssuedAt(iat)
+    .setNotBefore(iat)
+    .sign(new TextEncoder().encode(SECRET));
 }
 
-export function decodeToken(token: string): any {
+export async function verifyAuthToken(token: string) {
   try {
-    return jwt.verify(token, TOKEN_SECRET_KEY);
-  } catch {
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(SECRET)
+    );
+    return payload;
+  } catch (err) {
     return false;
   }
 }
