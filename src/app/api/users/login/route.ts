@@ -1,7 +1,7 @@
 import { User, comparePassword, isVerified } from '@/models/User';
 import { connectDb } from '@/services/db';
 import { NextRequest, NextResponse } from 'next/server';
-import { generateAuthToken } from '@/services/token';
+import { signAuthToken } from '@/services/token';
 import { isLoggedIn } from '../../helpers/auth';
 import { validate } from '@/validation/validator';
 import { loginSchema } from '@/validation/validationSchemas';
@@ -13,7 +13,7 @@ connectDb();
 export async function POST(request: NextRequest) {
   try {
     // prevent access to authorized users
-    if (isLoggedIn(request)) {
+    if (await isLoggedIn(request)) {
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },
         { status: 401 }
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-    const token = generateAuthToken({ userId: user._id, email: user.email });
+    const token = await signAuthToken({ userId: user._id, email: user.email });
     response.cookies.set(process.env.AUTH_COOKIE_NAME!, token, {
       httpOnly: true,
       maxAge: +process.env.AUTH_TOKEN_MAX_AGE!,

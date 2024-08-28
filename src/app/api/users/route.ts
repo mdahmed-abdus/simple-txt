@@ -9,7 +9,7 @@ connectDb();
 // get user details
 export async function GET(request: NextRequest) {
   try {
-    const userId = isLoggedIn(request);
+    const userId = await isLoggedIn(request);
     if (!userId) {
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },

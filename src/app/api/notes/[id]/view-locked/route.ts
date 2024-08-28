@@ -13,7 +13,7 @@ export async function POST(
   try {
     // check if user is logged in
     // accessible only for authenticated users
-    const userId = isLoggedIn(request);
+    const userId = await isLoggedIn(request);
     if (!userId) {
       return NextResponse.json(
         { success: false, message: 'Unauthorized' },
