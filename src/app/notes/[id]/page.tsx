@@ -98,7 +98,6 @@ export default function NoteById({ params }: { params: { id: string } }) {
               setNote={setNote}
               deleteNote={deleteNote}
               enterEditMode={enterEditMode}
-              notePassword={notePassword}
               setNotePassword={setNotePassword}
             />
           )}
