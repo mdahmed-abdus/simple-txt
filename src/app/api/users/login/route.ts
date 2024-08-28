@@ -61,6 +61,7 @@ export async function POST(request: NextRequest) {
     const token = generateAuthToken({ userId: user._id, email: user.email });
     response.cookies.set(process.env.AUTH_COOKIE_NAME!, token, {
       httpOnly: true,
+      maxAge: +process.env.AUTH_TOKEN_MAX_AGE!,
     });
 
     return response;
