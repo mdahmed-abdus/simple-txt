@@ -56,8 +56,10 @@ export const updateNoteById = (
 export const deleteNoteById = (id: string, notePassword?: string) =>
   apiHandler(() => http.delete(`/notes/${id}`, { data: { notePassword } }));
 
-export const lockNote = (id: string, notePassword: string) =>
-  apiHandler(() => http.post(`/notes/${id}/lock`, { notePassword }));
+export const lockNote = (
+  id: string,
+  lockNoteData: { notePassword: string; confirmNotePassword: string }
+) => apiHandler(() => http.post(`/notes/${id}/lock`, lockNoteData));
 
 export const unlockNote = (id: string, notePassword: string) =>
   apiHandler(() => http.post(`/notes/${id}/unlock`, { notePassword }));
