@@ -117,8 +117,8 @@ export default function DisplayLockedNote({
       <div className="mt-8 font-thin p-2">{getNoteBody()}</div>
       {currentLock && (
         <Form {...form}>
-          <form className="mt-8 flex flex-col items-center text-left">
-            <div className="md:w-3/4 lg:w-1/2 md:mx-auto">
+          <form className="mt-8 flex flex-col items-center">
+            <div className="md:w-3/4 lg:w-1/2 md:mx-auto text-center">
               <FormField
                 control={form.control}
                 name="notePassword"
@@ -127,7 +127,7 @@ export default function DisplayLockedNote({
                     <FormLabel>Note Password</FormLabel>
                     <FormControl>
                       <Input
-                        className="border-0 p-0"
+                        className="border-0 p-0 text-center"
                         type="password"
                         placeholder="Enter note password"
                         {...field}

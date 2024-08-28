@@ -90,7 +90,7 @@ export default function DisplayUnlockedNote({
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col items-center text-left"
           >
-            <div className="md:w-3/4 lg:w-1/2 md:mx-auto">
+            <div className="md:w-3/4 lg:w-1/2 md:mx-auto text-center">
               <FormField
                 control={form.control}
                 name="notePassword"
@@ -99,7 +99,7 @@ export default function DisplayUnlockedNote({
                     <FormLabel>Note Password</FormLabel>
                     <FormControl>
                       <Input
-                        className="border-0 p-0"
+                        className="border-0 p-0 text-center"
                         type="password"
                         placeholder="Enter note password"
                         {...field}
@@ -118,7 +118,7 @@ export default function DisplayUnlockedNote({
                     <FormLabel>Confirm note password</FormLabel>
                     <FormControl>
                       <Input
-                        className="border-0 p-0"
+                        className="border-0 p-0 text-center"
                         type="password"
                         placeholder="Confirm note password"
                         {...field}
