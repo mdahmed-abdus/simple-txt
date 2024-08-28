@@ -10,14 +10,12 @@ export default function DisplayNote({
   setNote,
   deleteNote,
   enterEditMode,
-  notePassword,
   setNotePassword,
 }: {
   note: Note;
   setNote: Dispatch<SetStateAction<Note>>;
   deleteNote: () => void;
   enterEditMode: () => void;
-  notePassword: string;
   setNotePassword: Dispatch<SetStateAction<string>>;
 }) {
   return note.locked ? (
@@ -26,12 +24,12 @@ export default function DisplayNote({
       setNote={setNote}
       deleteNote={deleteNote}
       enterEditMode={enterEditMode}
-      notePassword={notePassword}
       setNotePassword={setNotePassword}
     />
   ) : (
     <DisplayUnlockedNote
       note={note}
+      setNote={setNote}
       deleteNote={deleteNote}
       enterEditMode={enterEditMode}
     />
