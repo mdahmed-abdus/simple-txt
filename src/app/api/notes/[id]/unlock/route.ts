@@ -5,7 +5,7 @@ import { validateId } from '@/app/api/helpers/validateId';
 import { decrypt } from '@/services/cipher';
 import { filterPublicNote } from '@/app/api/helpers/note';
 import { validate } from '@/validation/validator';
-import { notePasswordSchema } from '@/validation/validationSchemas';
+import { unlockNoteSchema } from '@/validation/validationSchemas';
 
 // GET /api/notes/[id]/unlock
 // unlocks and decrypts note with given id
@@ -59,9 +59,8 @@ export async function POST(
     const {
       success: isNotePasswordValid,
       errorMessage: invalidNotePasswordMessage,
-    } = validate(notePasswordSchema, {
-      notePassword,
-    });
+    } = validate(unlockNoteSchema, { notePassword });
+
     if (!isNotePasswordValid) {
       return NextResponse.json(
         { success: false, message: invalidNotePasswordMessage },

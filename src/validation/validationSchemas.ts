@@ -73,6 +73,19 @@ export const noteSchema = z
     path: ['confirmNotePassword'],
   });
 
+export const lockNoteSchema = z
+  .object({
+    notePassword,
+    confirmNotePassword: notePassword,
+  })
+  .required()
+  .refine(data => data.notePassword === data.confirmNotePassword, {
+    message: 'Passwords do not match',
+    path: ['confirmNotePassword'],
+  });
+
+export const unlockNoteSchema = z.object({ notePassword }).required();
+
 export const updateNoteSchema = z.object({ title, body }).required();
 
 export const notePasswordSchema = z.object({ notePassword }).required();

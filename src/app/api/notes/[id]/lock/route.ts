@@ -3,7 +3,7 @@ import { filterPublicNote } from '@/app/api/helpers/note';
 import { validateId } from '@/app/api/helpers/validateId';
 import { User } from '@/models/User';
 import { encrypt } from '@/services/cipher';
-import { notePasswordSchema } from '@/validation/validationSchemas';
+import { lockNoteSchema } from '@/validation/validationSchemas';
 import { validate } from '@/validation/validator';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -53,15 +53,14 @@ export async function POST(
 
     // get notePassword from user
     const reqBody = await request.json();
-    const { notePassword } = reqBody;
+    const { notePassword, confirmNotePassword } = reqBody;
 
     // validate note password
     const {
       success: isNotePasswordValid,
       errorMessage: invalidNotePasswordMessage,
-    } = validate(notePasswordSchema, {
-      notePassword,
-    });
+    } = validate(lockNoteSchema, { notePassword, confirmNotePassword });
+
     if (!isNotePasswordValid) {
       return NextResponse.json(
         { success: false, message: invalidNotePasswordMessage },
